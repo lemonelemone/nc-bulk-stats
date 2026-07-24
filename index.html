@@ -23,7 +23,7 @@
 <body>
 
 <h1>NC Bulk Stats</h1>
-<p>Select or drag in any number of <code>.ncr</code> replay files!</p>
+<p>Select or drag in any number of <code>.ncr</code> replay files.</p>
 
 <div id="dropzone">
   <input type="file" id="fileInput" multiple accept=".ncr">
@@ -34,6 +34,7 @@
 <div class="actions" id="actions" style="display:none">
   <button id="viewMatch">Per match</button>
   <button id="viewSummary">Summary</button>
+  <button id="viewNcsc">Match (NCSC) Stats</button>
   <button id="downloadCsv">Download CSV</button>
   <button id="copyTable">Copy table</button>
   <span id="copyMsg"></span>
@@ -99,6 +100,9 @@ function isCleanChar(cp, strict) {
   if (cp > 0xFFFF) return true;
   if (cp >= 0xA0 && cp <= 0x24F) return true;
   if (cp >= 0x2070 && cp <= 0x209F) return true;
+  if (cp >= 0x4E00 && cp <= 0x9FFF) return true;   // CJK Unified Ideographs (e.g. 五)
+  if (cp >= 0x2600 && cp <= 0x27BF) return true;    // Misc Symbols / Dingbats (e.g. ☀)
+  if (cp >= 0xFE00 && cp <= 0xFE0F) return true;    // Variation Selectors (emoji-style modifier)
   if (!strict && cp >= 0x20 && cp !== 0x7F) return true;
   return false;
 }
@@ -142,12 +146,10 @@ function readUtf16String(data, pos, maxLen, strict) {
   return null;
 }
 
-function findNameMatches(data, tailBytes, lenientWindow) {
+function findNameMatches(data, tailBytes) {
   tailBytes = tailBytes || 400000;
-  lenientWindow = lenientWindow || 3000;
   const n = data.length;
   const start = Math.max(0, n - tailBytes);
-  const lenientStart = Math.max(0, n - lenientWindow);
   const matches = [];
   let pos = start;
   while (pos < n - 1) {
@@ -159,12 +161,6 @@ function findNameMatches(data, tailBytes, lenientWindow) {
         for (let off = 0; off < 12; off++) {
           const r = readUtf16String(data, pos + 2 + off, 40, true);
           if (r) candidates.push(r);
-        }
-        if (candidates.length === 0 && pos >= lenientStart) {
-          for (let off = 0; off < 12; off++) {
-            const r = readUtf16String(data, pos + 2 + off, 40, false);
-            if (r) candidates.push(r);
-          }
         }
         if (candidates.length > 0) found = candidates.reduce((a, b) => (b.name.length > a.name.length ? b : a));
       }
@@ -178,6 +174,23 @@ function findNameMatches(data, tailBytes, lenientWindow) {
     pos += 1;
   }
   return matches;
+}
+
+// Real name records always cluster tightly together at the very end of the
+// file (the footer). Physics-tick data can occasionally misdecode into a
+// short, isolated fake "name" far earlier in the file. Keep only the last
+// (highest-offset) run of matches where consecutive records are no more
+// than gapThreshold bytes apart, discarding any earlier isolated blips.
+function keepLastCluster(matches, gapThreshold) {
+  gapThreshold = gapThreshold || 5000;
+  if (matches.length === 0) return matches;
+  let clusterStartIdx = matches.length - 1;
+  for (let i = matches.length - 1; i > 0; i--) {
+    const gap = matches[i].offset - matches[i - 1].end;
+    if (gap > gapThreshold) break;
+    clusterStartIdx = i - 1;
+  }
+  return matches.slice(clusterStartIdx);
 }
 
 function extractEventsInSpan(data, spanStart, spanEnd) {
@@ -220,7 +233,7 @@ function extractEventsInSpan(data, spanStart, spanEnd) {
 
 function scanFooter(data, tailBytes) {
   const n = data.length;
-  const nameRecords = findNameMatches(data, tailBytes);
+  const nameRecords = keepLastCluster(findNameMatches(data, tailBytes));
   if (nameRecords.length === 0) return { nameRecords: [], events: [] };
   const events = [];
   const spanStarts = [Math.max(0, nameRecords[0].offset - 20)].concat(nameRecords.map(r => r.end));
@@ -373,6 +386,7 @@ dropzoneEl.addEventListener("drop", (e) => {
 });
 document.getElementById("viewMatch").addEventListener("click", () => { currentView = "match"; render(); });
 document.getElementById("viewSummary").addEventListener("click", () => { currentView = "summary"; render(); });
+document.getElementById("viewNcsc").addEventListener("click", () => { currentView = "ncsc"; render(); });
 document.getElementById("downloadCsv").addEventListener("click", downloadCSV);
 document.getElementById("copyTable").addEventListener("click", copyTable);
 
@@ -416,6 +430,29 @@ function aggregate(rows) {
   return Object.values(byName).map(a => ({ ...a, avgPoints: Math.round((a.points / a.matches) * 10) / 10 }));
 }
 
+// A "match" (e.g. "AF vs TD") can span several games (e.g. "AF vs TD G1",
+// "AF vs TD G2"), each uploaded as its own .ncr file. This turns a per-file
+// match name into the shared match key by normalizing underscores/dashes to
+// spaces and stripping a trailing game number like " G1", " G2", "_G3".
+function deriveMatchKey(matchName) {
+  let s = matchName.replace(/[_-]+/g, " ").trim();
+  s = s.replace(/\s*G\d+$/i, "").trim();
+  return s || matchName.trim();
+}
+
+function aggregateByMatch(rows) {
+  const grouped = {};
+  for (const r of rows) {
+    const matchKey = deriveMatchKey(r.match);
+    const nameKey = r.name.trim();
+    const key = matchKey + "\u0001" + nameKey;
+    if (!grouped[key]) grouped[key] = { match: matchKey, name: nameKey, games: 0, goals: 0, assists: 0, saves: 0, mvps: 0 };
+    const g = grouped[key];
+    g.games += 1; g.goals += r.goals; g.assists += r.assists; g.saves += r.saves; g.mvps += r.mvp ? 1 : 0;
+  }
+  return Object.values(grouped).sort((a, b) => a.match.localeCompare(b.match) || b.goals - a.goals);
+}
+
 function render() {
   let rows, header;
   if (currentView === "match") {
@@ -431,6 +468,20 @@ function render() {
         <td class="num">${r.saves}</td>
         <td class="num">${r.points}</td>
         <td>${r.mvp ? "MVP" : ""}</td>
+      </tr>`).join("");
+  } else if (currentView === "ncsc") {
+    rows = aggregateByMatch(perMatchRows);
+    header = ["Match", "Player", "Games", "G", "A", "S", "MVPs"];
+    tableHead.innerHTML = header.map((h, i) => `<th class="${i >= 2 ? 'num' : ''}">${h}</th>`).join("");
+    tableBody.innerHTML = rows.map(r => `
+      <tr>
+        <td>${escapeHtml(r.match)}</td>
+        <td>${escapeHtml(r.name)}</td>
+        <td class="num">${r.games}</td>
+        <td class="num">${r.goals}</td>
+        <td class="num">${r.assists}</td>
+        <td class="num">${r.saves}</td>
+        <td class="num">${r.mvps}</td>
       </tr>`).join("");
   } else {
     rows = aggregate(perMatchRows).sort((a, b) => b.points - a.points);
@@ -472,6 +523,10 @@ function downloadCSV() {
     rows = perMatchRows;
     header = ["match", "slot", "name", "goals", "assists", "saves", "points", "mvp"];
     rows = rows.map(r => [r.match, r.slot, r.name, r.goals, r.assists, r.saves, r.points, r.mvp]);
+  } else if (currentView === "ncsc") {
+    rows = aggregateByMatch(perMatchRows);
+    header = ["match", "player", "gamesPlayed", "goals", "assists", "saves", "mvps"];
+    rows = rows.map(r => [r.match, r.name, r.games, r.goals, r.assists, r.saves, r.mvps]);
   } else {
     rows = aggregate(perMatchRows);
     header = ["name", "matches", "goals", "assists", "saves", "totalPoints", "avgPoints", "mvps"];
@@ -482,7 +537,7 @@ function downloadCSV() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = currentView === "match" ? "ncr_stats.csv" : "ncr_summary.csv";
+  a.download = currentView === "match" ? "ncr_stats.csv" : (currentView === "ncsc" ? "ncr_ncsc_match_stats.csv" : "ncr_summary.csv");
   a.click();
   URL.revokeObjectURL(url);
 }
