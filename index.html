@@ -446,9 +446,9 @@ function aggregateByMatch(rows) {
     const matchKey = deriveMatchKey(r.match);
     const nameKey = r.name.trim();
     const key = matchKey + "\u0001" + nameKey;
-    if (!grouped[key]) grouped[key] = { match: matchKey, name: nameKey, games: 0, goals: 0, assists: 0, saves: 0, mvps: 0 };
+    if (!grouped[key]) grouped[key] = { match: matchKey, name: nameKey, games: 0, goals: 0, assists: 0, saves: 0, points: 0, mvps: 0 };
     const g = grouped[key];
-    g.games += 1; g.goals += r.goals; g.assists += r.assists; g.saves += r.saves; g.mvps += r.mvp ? 1 : 0;
+    g.games += 1; g.goals += r.goals; g.assists += r.assists; g.saves += r.saves; g.points += r.points; g.mvps += r.mvp ? 1 : 0;
   }
   return Object.values(grouped).sort((a, b) => a.match.localeCompare(b.match) || b.goals - a.goals);
 }
@@ -471,13 +471,14 @@ function render() {
       </tr>`).join("");
   } else if (currentView === "ncsc") {
     rows = aggregateByMatch(perMatchRows);
-    header = ["Match", "Player", "Games", "G", "A", "S", "MVPs"];
+    header = ["Match", "Player", "Games", "Points", "G", "A", "S", "MVPs"];
     tableHead.innerHTML = header.map((h, i) => `<th class="${i >= 2 ? 'num' : ''}">${h}</th>`).join("");
     tableBody.innerHTML = rows.map(r => `
       <tr>
         <td>${escapeHtml(r.match)}</td>
         <td>${escapeHtml(r.name)}</td>
         <td class="num">${r.games}</td>
+        <td class="num">${r.points}</td>
         <td class="num">${r.goals}</td>
         <td class="num">${r.assists}</td>
         <td class="num">${r.saves}</td>
@@ -525,8 +526,8 @@ function downloadCSV() {
     rows = rows.map(r => [r.match, r.slot, r.name, r.goals, r.assists, r.saves, r.points, r.mvp]);
   } else if (currentView === "ncsc") {
     rows = aggregateByMatch(perMatchRows);
-    header = ["match", "player", "gamesPlayed", "goals", "assists", "saves", "mvps"];
-    rows = rows.map(r => [r.match, r.name, r.games, r.goals, r.assists, r.saves, r.mvps]);
+    header = ["match", "player", "gamesPlayed", "points", "goals", "assists", "saves", "mvps"];
+    rows = rows.map(r => [r.match, r.name, r.games, r.points, r.goals, r.assists, r.saves, r.mvps]);
   } else {
     rows = aggregate(perMatchRows);
     header = ["name", "matches", "goals", "assists", "saves", "totalPoints", "avgPoints", "mvps"];
