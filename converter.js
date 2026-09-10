@@ -1,6 +1,8 @@
 import { Muxer, ArrayBufferTarget } from "./vendor/mp4-muxer.mjs";
 
 const SOURCE_FPS = 60;
+const REGULATION_TICKS = 5 * 60 * SOURCE_FPS;
+const MAX_GOAL_CELEBRATION_TICKS = 6 * SOURCE_FPS;
 const WORLD_WIDTH = 100;
 const WORLD_HEIGHT = 56.25;
 const PLAYER_RADIUS = 0.6103515625;
@@ -155,11 +157,50 @@ function parseNcr(buffer, filename) {
   if (!candidates.length) throw new Error("could not find the replay frames");
   candidates.sort((a, b) => scoreCandidate(b) - scoreCandidate(a));
   const format = candidates[0];
-  return {
+  const parsedReplay = {
     buffer, view, filename, version, layout, map, frameCount,
     duration: (frameCount - 1) / SOURCE_FPS,
     ...format
   };
+  parsedReplay.clockPauses = findGoalCelebrationPauses(parsedReplay);
+  parsedReplay.overtimeTick = parsedReplay.events.find((event) => event.type === 203)?.tick ?? null;
+  return parsedReplay;
+}
+
+function findGoalCelebrationPauses(parsedReplay) {
+  const pauses = [];
+  for (const goal of parsedReplay.events.filter((event) => event.type === 202)) {
+    const searchEnd = Math.min(parsedReplay.frameCount - 1, goal.tick + MAX_GOAL_CELEBRATION_TICKS);
+    for (let tick = goal.tick + 1; tick <= searchEnd; tick++) {
+      const ballOffset = 13 + tick * parsedReplay.frameSize + 4 + 33 * parsedReplay.playerCount;
+      const x = parsedReplay.view.getFloat32(ballOffset, false);
+      const y = parsedReplay.view.getFloat32(ballOffset + 4, false);
+      if (Math.abs(x - 50) < .0001 && Math.abs(y - WORLD_HEIGHT / 2) < .0001) {
+        const duration = Math.max(0, tick - goal.tick - 1);
+        if (duration) pauses.push({ goalTick: goal.tick, duration });
+        break;
+      }
+    }
+  }
+  return pauses;
+}
+
+function gameplayTickAt(replayTick) {
+  let gameplayTick = Math.max(0, replayTick);
+  for (const pause of replay.clockPauses) {
+    gameplayTick -= Math.min(Math.max(0, replayTick - pause.goalTick), pause.duration);
+  }
+  return gameplayTick;
+}
+
+function matchClockAt(replayTick) {
+  const gameplayTick = gameplayTickAt(replayTick);
+  if (replay.overtimeTick !== null && replayTick >= replay.overtimeTick) {
+    const overtimeSeconds = Math.max(0, Math.floor((gameplayTick - REGULATION_TICKS) / SOURCE_FPS));
+    return `+${Math.floor(overtimeSeconds / 60)}:${String(overtimeSeconds % 60).padStart(2, "0")}`;
+  }
+  const remainingSeconds = Math.max(0, 5 * 60 - Math.floor(gameplayTick / SOURCE_FPS));
+  return `${Math.floor(remainingSeconds / 60)}:${String(remainingSeconds % 60).padStart(2, "0")}`;
 }
 
 function scoreCandidate(candidate) {
@@ -338,24 +379,24 @@ function drawScoreboard(ctx, width, time, tick) {
     if (event.tick > tick) break;
     if (event.type === 202) event.slot1 % 2 === 0 ? blue++ : red++;
   }
-  const unit = width / 1920;
-  const scoreWidth = 64 * unit;
-  const timeWidth = 104 * unit;
-  const gap = 2 * unit;
+  const unit = width / 1280;
+  const scoreWidth = 98 * unit;
+  const timeWidth = 156 * unit;
+  const gap = 5 * unit;
   const boxWidth = scoreWidth * 2 + timeWidth + gap * 2;
   const x = (width - boxWidth) / 2;
-  const y = 8 * unit;
-  const h = 57 * unit;
+  const y = 12 * unit;
+  const h = 60 * unit;
   const border = Math.max(2, 4 * unit);
   ctx.save();
   ctx.lineWidth = border;
-  ctx.fillStyle = "#3b4f8f"; ctx.strokeStyle = "#132561"; roundRect(ctx, x, y, scoreWidth, h, 12 * unit); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = "#fff"; ctx.strokeStyle = "#000"; ctx.beginPath(); ctx.rect(x + scoreWidth + gap, y, timeWidth, h); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = "#d37647"; ctx.strokeStyle = "#8f390d"; roundRect(ctx, x + scoreWidth + timeWidth + gap * 2, y, scoreWidth, h, 12 * unit); ctx.fill(); ctx.stroke();
-  ctx.font = `bold ${Math.max(16, 36 * unit)}px Arial`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.fillStyle = "white"; ctx.fillText(String(blue), x + scoreWidth / 2, y + h * .47);
-  ctx.fillStyle = "black"; ctx.fillText(formatTime(time), x + scoreWidth + gap + timeWidth / 2, y + h * .47);
-  ctx.fillStyle = "white"; ctx.fillText(String(red), x + scoreWidth + timeWidth + gap * 2 + scoreWidth / 2, y + h * .47);
+  ctx.fillStyle = "rgba(75,100,180,.22)"; ctx.strokeStyle = "#17275f"; roundRect(ctx, x, y, scoreWidth, h, 15 * unit); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "rgba(205,205,205,.76)"; ctx.strokeStyle = "#111"; ctx.beginPath(); ctx.rect(x + scoreWidth + gap, y, timeWidth, h); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "rgba(190,105,65,.22)"; ctx.strokeStyle = "#84401e"; roundRect(ctx, x + scoreWidth + timeWidth + gap * 2, y, scoreWidth, h, 15 * unit); ctx.fill(); ctx.stroke();
+  ctx.font = `900 ${Math.max(18, 40 * unit)}px "Arial Black", Impact, Arial`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillStyle = "#050505"; ctx.fillText(String(blue), x + scoreWidth / 2, y + h * .49);
+  ctx.fillText(matchClockAt(time * SOURCE_FPS), x + scoreWidth + gap + timeWidth / 2, y + h * .49);
+  ctx.fillText(String(red), x + scoreWidth + timeWidth + gap * 2 + scoreWidth / 2, y + h * .49);
   ctx.restore();
 }
 

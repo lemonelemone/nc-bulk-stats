@@ -1,0 +1,904 @@
+<!DOCTYPE html><html><head><script>if (document.location.protocol === "http:") document.location.href = document.location.href.replace(/^http:/, "https:");</script>
+    <script src="scripts.js" async=""></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    <!--
+    <link href="https://fonts.googleapis.com/css?family=Baloo|Lato|Open+Sans|Fredoka+One|Sigmar+One|Sniglet" rel="stylesheet">
+-->
+
+    
+    
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>NitroClash.io - multiplayer soccer io game</title>
+    <meta name="description" content="Use your nitro boost to bump into other players and the ball to score goals in this multiplayer io game">
+    <meta name="keywords" content="nitroclash, nitroclashio, nitroclash.io, io games, io games space, online, sport, nitro, boost, bumper, football, hockey, rocket, league, cup, smash, soccer, turbo">
+    <meta property="og:title" content="NitroClash.io">
+    <meta property="og:description" content="Use your nitro-boost to bump into other players and the ball to score goals in this multiplayer io game">
+    <meta property="og:url" content="http://nitroclash.io/">
+    <meta property="og:image" content="http://nitroclash.io/img/facebook-banner.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="fb:app_id" content="225340674655459">
+
+    <meta property="og:type" content="website">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@NitroClashio">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="theme-color" content="#ffffff">
+
+    <script src="https://cdn.ravenjs.com/3.17.0/raven.min.js" crossorigin="anonymous"></script>
+    <!-- Google Analytics -->
+    <!--
+    <script>
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+        if (window.parent !== window.self)
+            ga('create', 'UA-103015995-1', {
+                'cookieFlags': 'samesite=none;secure'
+            });
+        else
+            ga('create', 'UA-103015995-1', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+-->
+    <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5SZZGJ9JXZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        var gtagconf = {};
+        if (window.parent !== window.self)
+            gtagconf.cookie_flags = 'samesite=none;secure';
+
+        gtag('config', 'G-5SZZGJ9JXZ', gtagconf);
+
+    </script>
+
+    <!-- GOOGLE SIGNIN -->
+    <script src="https://accounts.google.com/gsi/client" async="" defer=""></script>
+    <script type="text/javascript">
+        function onGoogleSignIn(u) {
+            if (typeof nitroclash === "undefined") {
+                setTimeout(function() {
+                    onGoogleSignIn(u);
+                }, 100);
+            } else
+                nitroclash.onGoogleSignIn(u);
+        }
+
+        function onFacebookLogin() {
+            if (typeof nitroclash === "undefined") {
+                setTimeout(function() {
+                    onFacebookLogin();
+                }, 100);
+            } else
+                FB.getLoginStatus(nitroclash.onFacebookLoginStatus);
+        }
+
+    </script>
+
+
+    <!-- Matomo -->
+    <!--
+    <script type="text/javascript">
+        var _paq = window._paq || [];
+        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+        _paq.push(["setCookieDomain", "*.nitroclash.io"]);
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function() {
+            var u = "https://nitroclash.matomo.cloud/";
+            _paq.push(['setTrackerUrl', u + 'matomo.php']);
+            _paq.push(['setSiteId', '1']);
+            var d = document,
+                g = d.createElement('script'),
+                s = d.getElementsByTagName('script')[0];
+            g.type = 'text/javascript';
+            g.async = true;
+            g.defer = true;
+            g.src = '//cdn.matomo.cloud/nitroclash.matomo.cloud/matomo.js';
+            s.parentNode.insertBefore(g, s);
+        })();
+
+    </script>
+-->
+    <!-- End Matomo Code -->
+
+
+<style type="text/css">@charset "UTF-8";.ui-helper-hidden{display:none}.ui-helper-hidden-accessible{border:0;clip:rect(0 0 0 0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px}.ui-helper-reset{margin:0;padding:0;border:0;outline:0;line-height:1.3;text-decoration:none;font-size:100%;list-style:none}.ui-helper-clearfix:after,.ui-helper-clearfix:before{content:"";display:table;border-collapse:collapse}.ui-helper-clearfix:after{clear:both}.ui-helper-zfix{width:100%;height:100%;top:0;left:0;position:absolute;opacity:0;filter:Alpha(Opacity=0)}.ui-front{z-index:100}.ui-state-disabled{cursor:default!important;pointer-events:none}.ui-icon{display:inline-block;vertical-align:middle;margin-top:-.25em;position:relative;text-indent:-99999px;overflow:hidden;background-repeat:no-repeat}.ui-widget-icon-block{left:50%;margin-left:-8px;display:block}.ui-widget-overlay{position:fixed;top:0;left:0;width:100%;height:100%}.ui-menu{list-style:none;padding:0;margin:0;display:block;outline:0}.ui-menu .ui-menu{position:absolute}.ui-menu .ui-menu-item{margin:0;cursor:pointer;list-style-image:url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)}.ui-menu .ui-menu-item-wrapper{position:relative;padding:3px 1em 3px .4em}.ui-menu .ui-menu-divider{margin:5px 0;height:0;font-size:0;line-height:0;border-width:1px 0 0 0}.ui-menu .ui-state-active,.ui-menu .ui-state-focus{margin:-1px}.ui-menu-icons{position:relative}.ui-menu-icons .ui-menu-item-wrapper{padding-left:2em}.ui-menu .ui-icon{position:absolute;top:0;bottom:0;left:.2em;margin:auto 0}.ui-menu .ui-menu-icon{left:auto;right:0}.ui-selectmenu-menu{padding:0;margin:0;position:absolute;top:0;left:0;display:none}.ui-selectmenu-menu .ui-menu{overflow:auto;overflow-x:hidden;padding-bottom:1px}.ui-selectmenu-menu .ui-menu .ui-selectmenu-optgroup{font-size:1em;font-weight:700;line-height:1.5;padding:2px .4em;margin:.5em 0 0 0;height:auto;border:0}.ui-selectmenu-open{display:block}.ui-selectmenu-text{display:block;margin-right:20px;overflow:hidden;text-overflow:ellipsis}.ui-selectmenu-button.ui-button{text-align:left;white-space:nowrap;width:14em}.ui-selectmenu-icon.ui-icon{float:right;margin-top:0}.ui-button{padding:.4em 1em;display:inline-block;position:relative;line-height:normal;margin-right:.1em;cursor:pointer;vertical-align:middle;text-align:center;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;overflow:visible}.ui-button,.ui-button:active,.ui-button:hover,.ui-button:link,.ui-button:visited{text-decoration:none}.ui-button-icon-only{width:2em;box-sizing:border-box;text-indent:-9999px;white-space:nowrap}input.ui-button.ui-button-icon-only{text-indent:0}.ui-button-icon-only .ui-icon{position:absolute;top:50%;left:50%;margin-top:-8px;margin-left:-8px}.ui-button.ui-icon-notext .ui-icon{padding:0;width:2.1em;height:2.1em;text-indent:-9999px;white-space:nowrap}input.ui-button.ui-icon-notext .ui-icon{width:auto;height:auto;text-indent:0;white-space:normal;padding:.4em 1em}button.ui-button::-moz-focus-inner,input.ui-button::-moz-focus-inner{border:0;padding:0}.ui-widget{font-family:Arial,Helvetica,sans-serif;font-size:1em}.ui-widget .ui-widget{font-size:1em}.ui-widget button,.ui-widget input,.ui-widget select,.ui-widget textarea{font-family:Arial,Helvetica,sans-serif;font-size:1em}.ui-widget.ui-widget-content{border:1px solid #c5c5c5}.ui-widget-content{border:1px solid #ddd;background:#fff;color:#333}.ui-widget-content a{color:#333}.ui-widget-header{border:1px solid #ddd;background:#e9e9e9;color:#333;font-weight:700}.ui-widget-header a{color:#333}.ui-button,.ui-state-default,.ui-widget-content .ui-state-default,.ui-widget-header .ui-state-default,html .ui-button.ui-state-disabled:active,html .ui-button.ui-state-disabled:hover{border:1px solid #c5c5c5;background:#f6f6f6;font-weight:400;color:#454545}.ui-button,.ui-state-default a,.ui-state-default a:link,.ui-state-default a:visited,a.ui-button,a:link.ui-button,a:visited.ui-button{color:#454545;text-decoration:none}.ui-button:focus,.ui-button:hover,.ui-state-focus,.ui-state-hover,.ui-widget-content .ui-state-focus,.ui-widget-content .ui-state-hover,.ui-widget-header .ui-state-focus,.ui-widget-header .ui-state-hover{border:1px solid #ccc;background:#ededed;font-weight:400;color:#2b2b2b}.ui-state-focus a,.ui-state-focus a:hover,.ui-state-focus a:link,.ui-state-focus a:visited,.ui-state-hover a,.ui-state-hover a:hover,.ui-state-hover a:link,.ui-state-hover a:visited,a.ui-button:focus,a.ui-button:hover{color:#2b2b2b;text-decoration:none}.ui-visual-focus{box-shadow:0 0 3px 1px #5e9ed6}.ui-button.ui-state-active:hover,.ui-button:active,.ui-state-active,.ui-widget-content .ui-state-active,.ui-widget-header .ui-state-active,a.ui-button:active{border:1px solid #003eff;background:#007fff;font-weight:400;color:#fff}.ui-icon-background,.ui-state-active .ui-icon-background{border:#003eff;background-color:#fff}.ui-state-active a,.ui-state-active a:link,.ui-state-active a:visited{color:#fff;text-decoration:none}.ui-state-highlight,.ui-widget-content .ui-state-highlight,.ui-widget-header .ui-state-highlight{border:1px solid #dad55e;background:#fffa90;color:#777620}.ui-state-checked{border:1px solid #dad55e;background:#fffa90}.ui-state-highlight a,.ui-widget-content .ui-state-highlight a,.ui-widget-header .ui-state-highlight a{color:#777620}.ui-state-error,.ui-widget-content .ui-state-error,.ui-widget-header .ui-state-error{border:1px solid #f1a899;background:#fddfdf;color:#5f3f3f}.ui-state-error a,.ui-widget-content .ui-state-error a,.ui-widget-header .ui-state-error a{color:#5f3f3f}.ui-state-error-text,.ui-widget-content .ui-state-error-text,.ui-widget-header .ui-state-error-text{color:#5f3f3f}.ui-priority-primary,.ui-widget-content .ui-priority-primary,.ui-widget-header .ui-priority-primary{font-weight:700}.ui-priority-secondary,.ui-widget-content .ui-priority-secondary,.ui-widget-header .ui-priority-secondary{opacity:.7;filter:Alpha(Opacity=70);font-weight:400}.ui-state-disabled,.ui-widget-content .ui-state-disabled,.ui-widget-header .ui-state-disabled{opacity:.35;filter:Alpha(Opacity=35);background-image:none}.ui-state-disabled .ui-icon{filter:Alpha(Opacity=35)}.ui-icon{width:16px;height:16px}.ui-icon,.ui-widget-content .ui-icon{background-image:url(img/ui-icons_444444_256x240.png)}.ui-widget-header .ui-icon{background-image:url(img/ui-icons_444444_256x240.png)}.ui-button:focus .ui-icon,.ui-button:hover .ui-icon,.ui-state-focus .ui-icon,.ui-state-hover .ui-icon{background-image:url(img/ui-icons_555555_256x240.png)}.ui-button:active .ui-icon,.ui-state-active .ui-icon{background-image:url(img/ui-icons_ffffff_256x240.png)}.ui-button .ui-state-highlight.ui-icon,.ui-state-highlight .ui-icon{background-image:url(img/ui-icons_777620_256x240.png)}.ui-state-error .ui-icon,.ui-state-error-text .ui-icon{background-image:url(img/ui-icons_cc0000_256x240.png)}.ui-button .ui-icon{background-image:url(img/ui-icons_777777_256x240.png)}.ui-icon-blank{background-position:16px 16px}.ui-icon-caret-1-n{background-position:0 0}.ui-icon-caret-1-ne{background-position:-16px 0}.ui-icon-caret-1-e{background-position:-32px 0}.ui-icon-caret-1-se{background-position:-48px 0}.ui-icon-caret-1-s{background-position:-65px 0}.ui-icon-caret-1-sw{background-position:-80px 0}.ui-icon-caret-1-w{background-position:-96px 0}.ui-icon-caret-1-nw{background-position:-112px 0}.ui-icon-caret-2-n-s{background-position:-128px 0}.ui-icon-caret-2-e-w{background-position:-144px 0}.ui-icon-triangle-1-n{background-position:0 -16px}.ui-icon-triangle-1-ne{background-position:-16px -16px}.ui-icon-triangle-1-e{background-position:-32px -16px}.ui-icon-triangle-1-se{background-position:-48px -16px}.ui-icon-triangle-1-s{background-position:-65px -16px}.ui-icon-triangle-1-sw{background-position:-80px -16px}.ui-icon-triangle-1-w{background-position:-96px -16px}.ui-icon-triangle-1-nw{background-position:-112px -16px}.ui-icon-triangle-2-n-s{background-position:-128px -16px}.ui-icon-triangle-2-e-w{background-position:-144px -16px}.ui-icon-arrow-1-n{background-position:0 -32px}.ui-icon-arrow-1-ne{background-position:-16px -32px}.ui-icon-arrow-1-e{background-position:-32px -32px}.ui-icon-arrow-1-se{background-position:-48px -32px}.ui-icon-arrow-1-s{background-position:-65px -32px}.ui-icon-arrow-1-sw{background-position:-80px -32px}.ui-icon-arrow-1-w{background-position:-96px -32px}.ui-icon-arrow-1-nw{background-position:-112px -32px}.ui-icon-arrow-2-n-s{background-position:-128px -32px}.ui-icon-arrow-2-ne-sw{background-position:-144px -32px}.ui-icon-arrow-2-e-w{background-position:-160px -32px}.ui-icon-arrow-2-se-nw{background-position:-176px -32px}.ui-icon-arrowstop-1-n{background-position:-192px -32px}.ui-icon-arrowstop-1-e{background-position:-208px -32px}.ui-icon-arrowstop-1-s{background-position:-224px -32px}.ui-icon-arrowstop-1-w{background-position:-240px -32px}.ui-icon-arrowthick-1-n{background-position:1px -48px}.ui-icon-arrowthick-1-ne{background-position:-16px -48px}.ui-icon-arrowthick-1-e{background-position:-32px -48px}.ui-icon-arrowthick-1-se{background-position:-48px -48px}.ui-icon-arrowthick-1-s{background-position:-64px -48px}.ui-icon-arrowthick-1-sw{background-position:-80px -48px}.ui-icon-arrowthick-1-w{background-position:-96px -48px}.ui-icon-arrowthick-1-nw{background-position:-112px -48px}.ui-icon-arrowthick-2-n-s{background-position:-128px -48px}.ui-icon-arrowthick-2-ne-sw{background-position:-144px -48px}.ui-icon-arrowthick-2-e-w{background-position:-160px -48px}.ui-icon-arrowthick-2-se-nw{background-position:-176px -48px}.ui-icon-arrowthickstop-1-n{background-position:-192px -48px}.ui-icon-arrowthickstop-1-e{background-position:-208px -48px}.ui-icon-arrowthickstop-1-s{background-position:-224px -48px}.ui-icon-arrowthickstop-1-w{background-position:-240px -48px}.ui-icon-arrowreturnthick-1-w{background-position:0 -64px}.ui-icon-arrowreturnthick-1-n{background-position:-16px -64px}.ui-icon-arrowreturnthick-1-e{background-position:-32px -64px}.ui-icon-arrowreturnthick-1-s{background-position:-48px -64px}.ui-icon-arrowreturn-1-w{background-position:-64px -64px}.ui-icon-arrowreturn-1-n{background-position:-80px -64px}.ui-icon-arrowreturn-1-e{background-position:-96px -64px}.ui-icon-arrowreturn-1-s{background-position:-112px -64px}.ui-icon-arrowrefresh-1-w{background-position:-128px -64px}.ui-icon-arrowrefresh-1-n{background-position:-144px -64px}.ui-icon-arrowrefresh-1-e{background-position:-160px -64px}.ui-icon-arrowrefresh-1-s{background-position:-176px -64px}.ui-icon-arrow-4{background-position:0 -80px}.ui-icon-arrow-4-diag{background-position:-16px -80px}.ui-icon-extlink{background-position:-32px -80px}.ui-icon-newwin{background-position:-48px -80px}.ui-icon-refresh{background-position:-64px -80px}.ui-icon-shuffle{background-position:-80px -80px}.ui-icon-transfer-e-w{background-position:-96px -80px}.ui-icon-transferthick-e-w{background-position:-112px -80px}.ui-icon-folder-collapsed{background-position:0 -96px}.ui-icon-folder-open{background-position:-16px -96px}.ui-icon-document{background-position:-32px -96px}.ui-icon-document-b{background-position:-48px -96px}.ui-icon-note{background-position:-64px -96px}.ui-icon-mail-closed{background-position:-80px -96px}.ui-icon-mail-open{background-position:-96px -96px}.ui-icon-suitcase{background-position:-112px -96px}.ui-icon-comment{background-position:-128px -96px}.ui-icon-person{background-position:-144px -96px}.ui-icon-print{background-position:-160px -96px}.ui-icon-trash{background-position:-176px -96px}.ui-icon-locked{background-position:-192px -96px}.ui-icon-unlocked{background-position:-208px -96px}.ui-icon-bookmark{background-position:-224px -96px}.ui-icon-tag{background-position:-240px -96px}.ui-icon-home{background-position:0 -112px}.ui-icon-flag{background-position:-16px -112px}.ui-icon-calendar{background-position:-32px -112px}.ui-icon-cart{background-position:-48px -112px}.ui-icon-pencil{background-position:-64px -112px}.ui-icon-clock{background-position:-80px -112px}.ui-icon-disk{background-position:-96px -112px}.ui-icon-calculator{background-position:-112px -112px}.ui-icon-zoomin{background-position:-128px -112px}.ui-icon-zoomout{background-position:-144px -112px}.ui-icon-search{background-position:-160px -112px}.ui-icon-wrench{background-position:-176px -112px}.ui-icon-gear{background-position:-192px -112px}.ui-icon-heart{background-position:-208px -112px}.ui-icon-star{background-position:-224px -112px}.ui-icon-link{background-position:-240px -112px}.ui-icon-cancel{background-position:0 -128px}.ui-icon-plus{background-position:-16px -128px}.ui-icon-plusthick{background-position:-32px -128px}.ui-icon-minus{background-position:-48px -128px}.ui-icon-minusthick{background-position:-64px -128px}.ui-icon-close{background-position:-80px -128px}.ui-icon-closethick{background-position:-96px -128px}.ui-icon-key{background-position:-112px -128px}.ui-icon-lightbulb{background-position:-128px -128px}.ui-icon-scissors{background-position:-144px -128px}.ui-icon-clipboard{background-position:-160px -128px}.ui-icon-copy{background-position:-176px -128px}.ui-icon-contact{background-position:-192px -128px}.ui-icon-image{background-position:-208px -128px}.ui-icon-video{background-position:-224px -128px}.ui-icon-script{background-position:-240px -128px}.ui-icon-alert{background-position:0 -144px}.ui-icon-info{background-position:-16px -144px}.ui-icon-notice{background-position:-32px -144px}.ui-icon-help{background-position:-48px -144px}.ui-icon-check{background-position:-64px -144px}.ui-icon-bullet{background-position:-80px -144px}.ui-icon-radio-on{background-position:-96px -144px}.ui-icon-radio-off{background-position:-112px -144px}.ui-icon-pin-w{background-position:-128px -144px}.ui-icon-pin-s{background-position:-144px -144px}.ui-icon-play{background-position:0 -160px}.ui-icon-pause{background-position:-16px -160px}.ui-icon-seek-next{background-position:-32px -160px}.ui-icon-seek-prev{background-position:-48px -160px}.ui-icon-seek-end{background-position:-64px -160px}.ui-icon-seek-start{background-position:-80px -160px}.ui-icon-seek-first{background-position:-80px -160px}.ui-icon-stop{background-position:-96px -160px}.ui-icon-eject{background-position:-112px -160px}.ui-icon-volume-off{background-position:-128px -160px}.ui-icon-volume-on{background-position:-144px -160px}.ui-icon-power{background-position:0 -176px}.ui-icon-signal-diag{background-position:-16px -176px}.ui-icon-signal{background-position:-32px -176px}.ui-icon-battery-0{background-position:-48px -176px}.ui-icon-battery-1{background-position:-64px -176px}.ui-icon-battery-2{background-position:-80px -176px}.ui-icon-battery-3{background-position:-96px -176px}.ui-icon-circle-plus{background-position:0 -192px}.ui-icon-circle-minus{background-position:-16px -192px}.ui-icon-circle-close{background-position:-32px -192px}.ui-icon-circle-triangle-e{background-position:-48px -192px}.ui-icon-circle-triangle-s{background-position:-64px -192px}.ui-icon-circle-triangle-w{background-position:-80px -192px}.ui-icon-circle-triangle-n{background-position:-96px -192px}.ui-icon-circle-arrow-e{background-position:-112px -192px}.ui-icon-circle-arrow-s{background-position:-128px -192px}.ui-icon-circle-arrow-w{background-position:-144px -192px}.ui-icon-circle-arrow-n{background-position:-160px -192px}.ui-icon-circle-zoomin{background-position:-176px -192px}.ui-icon-circle-zoomout{background-position:-192px -192px}.ui-icon-circle-check{background-position:-208px -192px}.ui-icon-circlesmall-plus{background-position:0 -208px}.ui-icon-circlesmall-minus{background-position:-16px -208px}.ui-icon-circlesmall-close{background-position:-32px -208px}.ui-icon-squaresmall-plus{background-position:-48px -208px}.ui-icon-squaresmall-minus{background-position:-64px -208px}.ui-icon-squaresmall-close{background-position:-80px -208px}.ui-icon-grip-dotted-vertical{background-position:0 -224px}.ui-icon-grip-dotted-horizontal{background-position:-16px -224px}.ui-icon-grip-solid-vertical{background-position:-32px -224px}.ui-icon-grip-solid-horizontal{background-position:-48px -224px}.ui-icon-gripsmall-diagonal-se{background-position:-64px -224px}.ui-icon-grip-diagonal-se{background-position:-80px -224px}.ui-corner-all,.ui-corner-left,.ui-corner-tl,.ui-corner-top{border-top-left-radius:3px}.ui-corner-all,.ui-corner-right,.ui-corner-top,.ui-corner-tr{border-top-right-radius:3px}.ui-corner-all,.ui-corner-bl,.ui-corner-bottom,.ui-corner-left{border-bottom-left-radius:3px}.ui-corner-all,.ui-corner-bottom,.ui-corner-br,.ui-corner-right{border-bottom-right-radius:3px}.ui-widget-overlay{background:#aaa;opacity:.3;filter:Alpha(Opacity=30)}.ui-widget-shadow{-webkit-box-shadow:0 0 5px #666;box-shadow:0 0 5px #666}@-webkit-keyframes bounce{0%,20%,53%,80%,to{-webkit-animation-timing-function:cubic-bezier(.215,.61,.355,1);-webkit-transform:translateZ(0);animation-timing-function:cubic-bezier(.215,.61,.355,1);transform:translateZ(0)}40%,43%{-webkit-animation-timing-function:cubic-bezier(.755,.05,.855,.06);-webkit-transform:translate3d(0,-30px,0);animation-timing-function:cubic-bezier(.755,.05,.855,.06);transform:translate3d(0,-30px,0)}70%{-webkit-animation-timing-function:cubic-bezier(.755,.05,.855,.06);-webkit-transform:translate3d(0,-15px,0);animation-timing-function:cubic-bezier(.755,.05,.855,.06);transform:translate3d(0,-15px,0)}90%{-webkit-transform:translate3d(0,-4px,0);transform:translate3d(0,-4px,0)}}@keyframes bounce{0%,20%,53%,80%,to{-webkit-animation-timing-function:cubic-bezier(.215,.61,.355,1);-webkit-transform:translateZ(0);animation-timing-function:cubic-bezier(.215,.61,.355,1);transform:translateZ(0)}40%,43%{-webkit-animation-timing-function:cubic-bezier(.755,.05,.855,.06);-webkit-transform:translate3d(0,-30px,0);animation-timing-function:cubic-bezier(.755,.05,.855,.06);transform:translate3d(0,-30px,0)}70%{-webkit-animation-timing-function:cubic-bezier(.755,.05,.855,.06);-webkit-transform:translate3d(0,-15px,0);animation-timing-function:cubic-bezier(.755,.05,.855,.06);transform:translate3d(0,-15px,0)}90%{-webkit-transform:translate3d(0,-4px,0);transform:translate3d(0,-4px,0)}}.bounce{-webkit-animation-name:bounce;-webkit-transform-origin:center bottom;animation-name:bounce;transform-origin:center bottom}@-webkit-keyframes flash{0%,50%,to{opacity:1}25%,75%{opacity:0}}@keyframes flash{0%,50%,to{opacity:1}25%,75%{opacity:0}}.flash{-webkit-animation-name:flash;animation-name:flash}@-webkit-keyframes pulse{0%{-webkit-transform:scaleX(1);transform:scaleX(1)}50%{-webkit-transform:scale3d(1.05,1.05,1.05);transform:scale3d(1.05,1.05,1.05)}to{-webkit-transform:scaleX(1);transform:scaleX(1)}}@keyframes pulse{0%{-webkit-transform:scaleX(1);transform:scaleX(1)}50%{-webkit-transform:scale3d(1.05,1.05,1.05);transform:scale3d(1.05,1.05,1.05)}to{-webkit-transform:scaleX(1);transform:scaleX(1)}}.pulse{-webkit-animation-name:pulse;animation-name:pulse}@-webkit-keyframes rubberBand{0%{-webkit-transform:scaleX(1);transform:scaleX(1)}30%{-webkit-transform:scale3d(1.25,.75,1);transform:scale3d(1.25,.75,1)}40%{-webkit-transform:scale3d(.75,1.25,1);transform:scale3d(.75,1.25,1)}50%{-webkit-transform:scale3d(1.15,.85,1);transform:scale3d(1.15,.85,1)}65%{-webkit-transform:scale3d(.95,1.05,1);transform:scale3d(.95,1.05,1)}75%{-webkit-transform:scale3d(1.05,.95,1);transform:scale3d(1.05,.95,1)}to{-webkit-transform:scaleX(1);transform:scaleX(1)}}@keyframes rubberBand{0%{-webkit-transform:scaleX(1);transform:scaleX(1)}30%{-webkit-transform:scale3d(1.25,.75,1);transform:scale3d(1.25,.75,1)}40%{-webkit-transform:scale3d(.75,1.25,1);transform:scale3d(.75,1.25,1)}50%{-webkit-transform:scale3d(1.15,.85,1);transform:scale3d(1.15,.85,1)}65%{-webkit-transform:scale3d(.95,1.05,1);transform:scale3d(.95,1.05,1)}75%{-webkit-transform:scale3d(1.05,.95,1);transform:scale3d(1.05,.95,1)}to{-webkit-transform:scaleX(1);transform:scaleX(1)}}.rubberBand{-webkit-animation-name:rubberBand;animation-name:rubberBand}@-webkit-keyframes shake{0%,to{-webkit-transform:translateZ(0);transform:translateZ(0)}10%,30%,50%,70%,90%{-webkit-transform:translate3d(-10px,0,0);transform:translate3d(-10px,0,0)}20%,40%,60%,80%{-webkit-transform:translate3d(10px,0,0);transform:translate3d(10px,0,0)}}@keyframes shake{0%,to{-webkit-transform:translateZ(0);transform:translateZ(0)}10%,30%,50%,70%,90%{-webkit-transform:translate3d(-10px,0,0);transform:translate3d(-10px,0,0)}20%,40%,60%,80%{-webkit-transform:translate3d(10px,0,0);transform:translate3d(10px,0,0)}}.shake{-webkit-animation-name:shake;animation-name:shake}@-webkit-keyframes headShake{0%{-webkit-transform:translateX(0);transform:translateX(0)}6.5%{-webkit-transform:translateX(-6px) rotateY(-9deg);transform:translateX(-6px) rotateY(-9deg)}18.5%{-webkit-transform:translateX(5px) rotateY(7deg);transform:translateX(5px) rotateY(7deg)}31.5%{-webkit-transform:translateX(-3px) rotateY(-5deg);transform:translateX(-3px) rotateY(-5deg)}43.5%{-webkit-transform:translateX(2px) rotateY(3deg);transform:translateX(2px) rotateY(3deg)}50%{-webkit-transform:translateX(0);transform:translateX(0)}}@keyframes headShake{0%{-webkit-transform:translateX(0);transform:translateX(0)}6.5%{-webkit-transform:translateX(-6px) rotateY(-9deg);transform:translateX(-6px) rotateY(-9deg)}18.5%{-webkit-transform:translateX(5px) rotateY(7deg);transform:translateX(5px) rotateY(7deg)}31.5%{-webkit-transform:translateX(-3px) rotateY(-5deg);transform:translateX(-3px) rotateY(-5deg)}43.5%{-webkit-transform:translateX(2px) rotateY(3deg);transform:translateX(2px) rotateY(3deg)}50%{-webkit-transform:translateX(0);transform:translateX(0)}}.headShake{-webkit-animation-name:headShake;-webkit-animation-timing-function:ease-in-out;animation-name:headShake;animation-timing-function:ease-in-out}@-webkit-keyframes swing{20%{-webkit-transform:rotate(15deg);transform:rotate(15deg)}40%{-webkit-transform:rotate(-10deg);transform:rotate(-10deg)}60%{-webkit-transform:rotate(5deg);transform:rotate(5deg)}80%{-webkit-transform:rotate(-5deg);transform:rotate(-5deg)}to{-webkit-transform:rotate(0);transform:rotate(0)}}@keyframes swing{20%{-webkit-transform:rotate(15deg);transform:rotate(15deg)}40%{-webkit-transform:rotate(-10deg);transform:rotate(-10deg)}60%{-webkit-transform:rotate(5deg);transform:rotate(5deg)}80%{-webkit-transform:rotate(-5deg);transform:rotate(-5deg)}to{-webkit-transform:rotate(0);transform:rotate(0)}}.swing{-webkit-animation-name:swing;-webkit-transform-origin:top center;animation-name:swing;transform-origin:top center}@-webkit-keyframes tada{0%{-webkit-transform:scaleX(1);transform:scaleX(1)}10%,20%{-webkit-transform:scale3d(.9,.9,.9) rotate(-3deg);transform:scale3d(.9,.9,.9) rotate(-3deg)}30%,50%,70%,90%{-webkit-transform:scale3d(1.1,1.1,1.1) rotate(3deg);transform:scale3d(1.1,1.1,1.1) rotate(3deg)}40%,60%,80%{-webkit-transform:scale3d(1.1,1.1,1.1) rotate(-3deg);transform:scale3d(1.1,1.1,1.1) rotate(-3deg)}to{-webkit-transform:scaleX(1);transform:scaleX(1)}}@keyframes tada{0%{-webkit-transform:scaleX(1);transform:scaleX(1)}10%,20%{-webkit-transform:scale3d(.9,.9,.9) rotate(-3deg);transform:scale3d(.9,.9,.9) rotate(-3deg)}30%,50%,70%,90%{-webkit-transform:scale3d(1.1,1.1,1.1) rotate(3deg);transform:scale3d(1.1,1.1,1.1) rotate(3deg)}40%,60%,80%{-webkit-transform:scale3d(1.1,1.1,1.1) rotate(-3deg);transform:scale3d(1.1,1.1,1.1) rotate(-3deg)}to{-webkit-transform:scaleX(1);transform:scaleX(1)}}.tada{-webkit-animation-name:tada;animation-name:tada}@-webkit-keyframes wobble{0%{-webkit-transform:translateZ(0);transform:translateZ(0)}15%{-webkit-transform:translate3d(-25%,0,0) rotate(-5deg);transform:translate3d(-25%,0,0) rotate(-5deg)}30%{-webkit-transform:translate3d(20%,0,0) rotate(3deg);transform:translate3d(20%,0,0) rotate(3deg)}45%{-webkit-transform:translate3d(-15%,0,0) rotate(-3deg);transform:translate3d(-15%,0,0) rotate(-3deg)}60%{-webkit-transform:translate3d(10%,0,0) rotate(2deg);transform:translate3d(10%,0,0) rotate(2deg)}75%{-webkit-transform:translate3d(-5%,0,0) rotate(-1deg);transform:translate3d(-5%,0,0) rotate(-1deg)}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}@keyframes wobble{0%{-webkit-transform:translateZ(0);transform:translateZ(0)}15%{-webkit-transform:translate3d(-25%,0,0) rotate(-5deg);transform:translate3d(-25%,0,0) rotate(-5deg)}30%{-webkit-transform:translate3d(20%,0,0) rotate(3deg);transform:translate3d(20%,0,0) rotate(3deg)}45%{-webkit-transform:translate3d(-15%,0,0) rotate(-3deg);transform:translate3d(-15%,0,0) rotate(-3deg)}60%{-webkit-transform:translate3d(10%,0,0) rotate(2deg);transform:translate3d(10%,0,0) rotate(2deg)}75%{-webkit-transform:translate3d(-5%,0,0) rotate(-1deg);transform:translate3d(-5%,0,0) rotate(-1deg)}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}.wobble{-webkit-animation-name:wobble;animation-name:wobble}@-webkit-keyframes jello{0%,11.1%,to{-webkit-transform:translateZ(0);transform:translateZ(0)}22.2%{-webkit-transform:skewX(-12.5deg) skewY(-12.5deg);transform:skewX(-12.5deg) skewY(-12.5deg)}33.3%{-webkit-transform:skewX(6.25deg) skewY(6.25deg);transform:skewX(6.25deg) skewY(6.25deg)}44.4%{-webkit-transform:skewX(-3.125deg) skewY(-3.125deg);transform:skewX(-3.125deg) skewY(-3.125deg)}55.5%{-webkit-transform:skewX(1.5625deg) skewY(1.5625deg);transform:skewX(1.5625deg) skewY(1.5625deg)}66.6%{-webkit-transform:skewX(-.78125deg) skewY(-.78125deg);transform:skewX(-.78125deg) skewY(-.78125deg)}77.7%{-webkit-transform:skewX(.390625deg) skewY(.390625deg);transform:skewX(.390625deg) skewY(.390625deg)}88.8%{-webkit-transform:skewX(-.1953125deg) skewY(-.1953125deg);transform:skewX(-.1953125deg) skewY(-.1953125deg)}}@keyframes jello{0%,11.1%,to{-webkit-transform:translateZ(0);transform:translateZ(0)}22.2%{-webkit-transform:skewX(-12.5deg) skewY(-12.5deg);transform:skewX(-12.5deg) skewY(-12.5deg)}33.3%{-webkit-transform:skewX(6.25deg) skewY(6.25deg);transform:skewX(6.25deg) skewY(6.25deg)}44.4%{-webkit-transform:skewX(-3.125deg) skewY(-3.125deg);transform:skewX(-3.125deg) skewY(-3.125deg)}55.5%{-webkit-transform:skewX(1.5625deg) skewY(1.5625deg);transform:skewX(1.5625deg) skewY(1.5625deg)}66.6%{-webkit-transform:skewX(-.78125deg) skewY(-.78125deg);transform:skewX(-.78125deg) skewY(-.78125deg)}77.7%{-webkit-transform:skewX(.390625deg) skewY(.390625deg);transform:skewX(.390625deg) skewY(.390625deg)}88.8%{-webkit-transform:skewX(-.1953125deg) skewY(-.1953125deg);transform:skewX(-.1953125deg) skewY(-.1953125deg)}}.jello{-webkit-animation-name:jello;-webkit-transform-origin:center;animation-name:jello;transform-origin:center}@-webkit-keyframes heartBeat{0%{-webkit-transform:scale(1);transform:scale(1)}14%{-webkit-transform:scale(1.3);transform:scale(1.3)}28%{-webkit-transform:scale(1);transform:scale(1)}42%{-webkit-transform:scale(1.3);transform:scale(1.3)}70%{-webkit-transform:scale(1);transform:scale(1)}}@keyframes heartBeat{0%{-webkit-transform:scale(1);transform:scale(1)}14%{-webkit-transform:scale(1.3);transform:scale(1.3)}28%{-webkit-transform:scale(1);transform:scale(1)}42%{-webkit-transform:scale(1.3);transform:scale(1.3)}70%{-webkit-transform:scale(1);transform:scale(1)}}.heartBeat{-webkit-animation-duration:1.3s;-webkit-animation-name:heartBeat;-webkit-animation-timing-function:ease-in-out;animation-duration:1.3s;animation-name:heartBeat;animation-timing-function:ease-in-out}@-webkit-keyframes bounceIn{0%,20%,40%,60%,80%,to{-webkit-animation-timing-function:cubic-bezier(.215,.61,.355,1);animation-timing-function:cubic-bezier(.215,.61,.355,1)}0%{-webkit-transform:scale3d(.3,.3,.3);opacity:0;transform:scale3d(.3,.3,.3)}20%{-webkit-transform:scale3d(1.1,1.1,1.1);transform:scale3d(1.1,1.1,1.1)}40%{-webkit-transform:scale3d(.9,.9,.9);transform:scale3d(.9,.9,.9)}60%{-webkit-transform:scale3d(1.03,1.03,1.03);opacity:1;transform:scale3d(1.03,1.03,1.03)}80%{-webkit-transform:scale3d(.97,.97,.97);transform:scale3d(.97,.97,.97)}to{-webkit-transform:scaleX(1);opacity:1;transform:scaleX(1)}}@keyframes bounceIn{0%,20%,40%,60%,80%,to{-webkit-animation-timing-function:cubic-bezier(.215,.61,.355,1);animation-timing-function:cubic-bezier(.215,.61,.355,1)}0%{-webkit-transform:scale3d(.3,.3,.3);opacity:0;transform:scale3d(.3,.3,.3)}20%{-webkit-transform:scale3d(1.1,1.1,1.1);transform:scale3d(1.1,1.1,1.1)}40%{-webkit-transform:scale3d(.9,.9,.9);transform:scale3d(.9,.9,.9)}60%{-webkit-transform:scale3d(1.03,1.03,1.03);opacity:1;transform:scale3d(1.03,1.03,1.03)}80%{-webkit-transform:scale3d(.97,.97,.97);transform:scale3d(.97,.97,.97)}to{-webkit-transform:scaleX(1);opacity:1;transform:scaleX(1)}}.bounceIn{-webkit-animation-duration:.75s;-webkit-animation-name:bounceIn;animation-duration:.75s;animation-name:bounceIn}@-webkit-keyframes bounceInDown{0%,60%,75%,90%,to{-webkit-animation-timing-function:cubic-bezier(.215,.61,.355,1);animation-timing-function:cubic-bezier(.215,.61,.355,1)}0%{-webkit-transform:translate3d(0,-3000px,0);opacity:0;transform:translate3d(0,-3000px,0)}60%{-webkit-transform:translate3d(0,25px,0);opacity:1;transform:translate3d(0,25px,0)}75%{-webkit-transform:translate3d(0,-10px,0);transform:translate3d(0,-10px,0)}90%{-webkit-transform:translate3d(0,5px,0);transform:translate3d(0,5px,0)}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}@keyframes bounceInDown{0%,60%,75%,90%,to{-webkit-animation-timing-function:cubic-bezier(.215,.61,.355,1);animation-timing-function:cubic-bezier(.215,.61,.355,1)}0%{-webkit-transform:translate3d(0,-3000px,0);opacity:0;transform:translate3d(0,-3000px,0)}60%{-webkit-transform:translate3d(0,25px,0);opacity:1;transform:translate3d(0,25px,0)}75%{-webkit-transform:translate3d(0,-10px,0);transform:translate3d(0,-10px,0)}90%{-webkit-transform:translate3d(0,5px,0);transform:translate3d(0,5px,0)}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}.bounceInDown{-webkit-animation-name:bounceInDown;animation-name:bounceInDown}@-webkit-keyframes bounceInLeft{0%,60%,75%,90%,to{-webkit-animation-timing-function:cubic-bezier(.215,.61,.355,1);animation-timing-function:cubic-bezier(.215,.61,.355,1)}0%{-webkit-transform:translate3d(-3000px,0,0);opacity:0;transform:translate3d(-3000px,0,0)}60%{-webkit-transform:translate3d(25px,0,0);opacity:1;transform:translate3d(25px,0,0)}75%{-webkit-transform:translate3d(-10px,0,0);transform:translate3d(-10px,0,0)}90%{-webkit-transform:translate3d(5px,0,0);transform:translate3d(5px,0,0)}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}@keyframes bounceInLeft{0%,60%,75%,90%,to{-webkit-animation-timing-function:cubic-bezier(.215,.61,.355,1);animation-timing-function:cubic-bezier(.215,.61,.355,1)}0%{-webkit-transform:translate3d(-3000px,0,0);opacity:0;transform:translate3d(-3000px,0,0)}60%{-webkit-transform:translate3d(25px,0,0);opacity:1;transform:translate3d(25px,0,0)}75%{-webkit-transform:translate3d(-10px,0,0);transform:translate3d(-10px,0,0)}90%{-webkit-transform:translate3d(5px,0,0);transform:translate3d(5px,0,0)}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}.bounceInLeft{-webkit-animation-name:bounceInLeft;animation-name:bounceInLeft}@-webkit-keyframes bounceInRight{0%,60%,75%,90%,to{-webkit-animation-timing-function:cubic-bezier(.215,.61,.355,1);animation-timing-function:cubic-bezier(.215,.61,.355,1)}0%{-webkit-transform:translate3d(3000px,0,0);opacity:0;transform:translate3d(3000px,0,0)}60%{-webkit-transform:translate3d(-25px,0,0);opacity:1;transform:translate3d(-25px,0,0)}75%{-webkit-transform:translate3d(10px,0,0);transform:translate3d(10px,0,0)}90%{-webkit-transform:translate3d(-5px,0,0);transform:translate3d(-5px,0,0)}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}@keyframes bounceInRight{0%,60%,75%,90%,to{-webkit-animation-timing-function:cubic-bezier(.215,.61,.355,1);animation-timing-function:cubic-bezier(.215,.61,.355,1)}0%{-webkit-transform:translate3d(3000px,0,0);opacity:0;transform:translate3d(3000px,0,0)}60%{-webkit-transform:translate3d(-25px,0,0);opacity:1;transform:translate3d(-25px,0,0)}75%{-webkit-transform:translate3d(10px,0,0);transform:translate3d(10px,0,0)}90%{-webkit-transform:translate3d(-5px,0,0);transform:translate3d(-5px,0,0)}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}.bounceInRight{-webkit-animation-name:bounceInRight;animation-name:bounceInRight}@-webkit-keyframes bounceInUp{0%,60%,75%,90%,to{-webkit-animation-timing-function:cubic-bezier(.215,.61,.355,1);animation-timing-function:cubic-bezier(.215,.61,.355,1)}0%{-webkit-transform:translate3d(0,3000px,0);opacity:0;transform:translate3d(0,3000px,0)}60%{-webkit-transform:translate3d(0,-20px,0);opacity:1;transform:translate3d(0,-20px,0)}75%{-webkit-transform:translate3d(0,10px,0);transform:translate3d(0,10px,0)}90%{-webkit-transform:translate3d(0,-5px,0);transform:translate3d(0,-5px,0)}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}@keyframes bounceInUp{0%,60%,75%,90%,to{-webkit-animation-timing-function:cubic-bezier(.215,.61,.355,1);animation-timing-function:cubic-bezier(.215,.61,.355,1)}0%{-webkit-transform:translate3d(0,3000px,0);opacity:0;transform:translate3d(0,3000px,0)}60%{-webkit-transform:translate3d(0,-20px,0);opacity:1;transform:translate3d(0,-20px,0)}75%{-webkit-transform:translate3d(0,10px,0);transform:translate3d(0,10px,0)}90%{-webkit-transform:translate3d(0,-5px,0);transform:translate3d(0,-5px,0)}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}.bounceInUp{-webkit-animation-name:bounceInUp;animation-name:bounceInUp}@-webkit-keyframes bounceOut{20%{-webkit-transform:scale3d(.9,.9,.9);transform:scale3d(.9,.9,.9)}50%,55%{-webkit-transform:scale3d(1.1,1.1,1.1);opacity:1;transform:scale3d(1.1,1.1,1.1)}to{-webkit-transform:scale3d(.3,.3,.3);opacity:0;transform:scale3d(.3,.3,.3)}}@keyframes bounceOut{20%{-webkit-transform:scale3d(.9,.9,.9);transform:scale3d(.9,.9,.9)}50%,55%{-webkit-transform:scale3d(1.1,1.1,1.1);opacity:1;transform:scale3d(1.1,1.1,1.1)}to{-webkit-transform:scale3d(.3,.3,.3);opacity:0;transform:scale3d(.3,.3,.3)}}.bounceOut{-webkit-animation-duration:.75s;-webkit-animation-name:bounceOut;animation-duration:.75s;animation-name:bounceOut}@-webkit-keyframes bounceOutDown{20%{-webkit-transform:translate3d(0,10px,0);transform:translate3d(0,10px,0)}40%,45%{-webkit-transform:translate3d(0,-20px,0);opacity:1;transform:translate3d(0,-20px,0)}to{-webkit-transform:translate3d(0,2000px,0);opacity:0;transform:translate3d(0,2000px,0)}}@keyframes bounceOutDown{20%{-webkit-transform:translate3d(0,10px,0);transform:translate3d(0,10px,0)}40%,45%{-webkit-transform:translate3d(0,-20px,0);opacity:1;transform:translate3d(0,-20px,0)}to{-webkit-transform:translate3d(0,2000px,0);opacity:0;transform:translate3d(0,2000px,0)}}.bounceOutDown{-webkit-animation-name:bounceOutDown;animation-name:bounceOutDown}@-webkit-keyframes bounceOutLeft{20%{-webkit-transform:translate3d(20px,0,0);opacity:1;transform:translate3d(20px,0,0)}to{-webkit-transform:translate3d(-2000px,0,0);opacity:0;transform:translate3d(-2000px,0,0)}}@keyframes bounceOutLeft{20%{-webkit-transform:translate3d(20px,0,0);opacity:1;transform:translate3d(20px,0,0)}to{-webkit-transform:translate3d(-2000px,0,0);opacity:0;transform:translate3d(-2000px,0,0)}}.bounceOutLeft{-webkit-animation-name:bounceOutLeft;animation-name:bounceOutLeft}@-webkit-keyframes bounceOutRight{20%{-webkit-transform:translate3d(-20px,0,0);opacity:1;transform:translate3d(-20px,0,0)}to{-webkit-transform:translate3d(2000px,0,0);opacity:0;transform:translate3d(2000px,0,0)}}@keyframes bounceOutRight{20%{-webkit-transform:translate3d(-20px,0,0);opacity:1;transform:translate3d(-20px,0,0)}to{-webkit-transform:translate3d(2000px,0,0);opacity:0;transform:translate3d(2000px,0,0)}}.bounceOutRight{-webkit-animation-name:bounceOutRight;animation-name:bounceOutRight}@-webkit-keyframes bounceOutUp{20%{-webkit-transform:translate3d(0,-10px,0);transform:translate3d(0,-10px,0)}40%,45%{-webkit-transform:translate3d(0,20px,0);opacity:1;transform:translate3d(0,20px,0)}to{-webkit-transform:translate3d(0,-2000px,0);opacity:0;transform:translate3d(0,-2000px,0)}}@keyframes bounceOutUp{20%{-webkit-transform:translate3d(0,-10px,0);transform:translate3d(0,-10px,0)}40%,45%{-webkit-transform:translate3d(0,20px,0);opacity:1;transform:translate3d(0,20px,0)}to{-webkit-transform:translate3d(0,-2000px,0);opacity:0;transform:translate3d(0,-2000px,0)}}.bounceOutUp{-webkit-animation-name:bounceOutUp;animation-name:bounceOutUp}@-webkit-keyframes fadeIn{0%{opacity:0}to{opacity:1}}@keyframes fadeIn{0%{opacity:0}to{opacity:1}}.fadeIn{-webkit-animation-name:fadeIn;animation-name:fadeIn}@-webkit-keyframes fadeInDown{0%{-webkit-transform:translate3d(0,-100%,0);opacity:0;transform:translate3d(0,-100%,0)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}@keyframes fadeInDown{0%{-webkit-transform:translate3d(0,-100%,0);opacity:0;transform:translate3d(0,-100%,0)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}.fadeInDown{-webkit-animation-name:fadeInDown;animation-name:fadeInDown}@-webkit-keyframes fadeInDownBig{0%{-webkit-transform:translate3d(0,-2000px,0);opacity:0;transform:translate3d(0,-2000px,0)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}@keyframes fadeInDownBig{0%{-webkit-transform:translate3d(0,-2000px,0);opacity:0;transform:translate3d(0,-2000px,0)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}.fadeInDownBig{-webkit-animation-name:fadeInDownBig;animation-name:fadeInDownBig}@-webkit-keyframes fadeInLeft{0%{-webkit-transform:translate3d(-100%,0,0);opacity:0;transform:translate3d(-100%,0,0)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}@keyframes fadeInLeft{0%{-webkit-transform:translate3d(-100%,0,0);opacity:0;transform:translate3d(-100%,0,0)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}.fadeInLeft{-webkit-animation-name:fadeInLeft;animation-name:fadeInLeft}@-webkit-keyframes fadeInLeftBig{0%{-webkit-transform:translate3d(-2000px,0,0);opacity:0;transform:translate3d(-2000px,0,0)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}@keyframes fadeInLeftBig{0%{-webkit-transform:translate3d(-2000px,0,0);opacity:0;transform:translate3d(-2000px,0,0)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}.fadeInLeftBig{-webkit-animation-name:fadeInLeftBig;animation-name:fadeInLeftBig}@-webkit-keyframes fadeInRight{0%{-webkit-transform:translate3d(100%,0,0);opacity:0;transform:translate3d(100%,0,0)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}@keyframes fadeInRight{0%{-webkit-transform:translate3d(100%,0,0);opacity:0;transform:translate3d(100%,0,0)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}.fadeInRight{-webkit-animation-name:fadeInRight;animation-name:fadeInRight}@-webkit-keyframes fadeInRightBig{0%{-webkit-transform:translate3d(2000px,0,0);opacity:0;transform:translate3d(2000px,0,0)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}@keyframes fadeInRightBig{0%{-webkit-transform:translate3d(2000px,0,0);opacity:0;transform:translate3d(2000px,0,0)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}.fadeInRightBig{-webkit-animation-name:fadeInRightBig;animation-name:fadeInRightBig}@-webkit-keyframes fadeInUp{0%{-webkit-transform:translate3d(0,100%,0);opacity:0;transform:translate3d(0,100%,0)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}@keyframes fadeInUp{0%{-webkit-transform:translate3d(0,100%,0);opacity:0;transform:translate3d(0,100%,0)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}.fadeInUp{-webkit-animation-name:fadeInUp;animation-name:fadeInUp}@-webkit-keyframes fadeInUpBig{0%{-webkit-transform:translate3d(0,2000px,0);opacity:0;transform:translate3d(0,2000px,0)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}@keyframes fadeInUpBig{0%{-webkit-transform:translate3d(0,2000px,0);opacity:0;transform:translate3d(0,2000px,0)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}.fadeInUpBig{-webkit-animation-name:fadeInUpBig;animation-name:fadeInUpBig}@-webkit-keyframes fadeOut{0%{opacity:1}to{opacity:0}}@keyframes fadeOut{0%{opacity:1}to{opacity:0}}.fadeOut{-webkit-animation-name:fadeOut;animation-name:fadeOut}@-webkit-keyframes fadeOutDown{0%{opacity:1}to{-webkit-transform:translate3d(0,100%,0);opacity:0;transform:translate3d(0,100%,0)}}@keyframes fadeOutDown{0%{opacity:1}to{-webkit-transform:translate3d(0,100%,0);opacity:0;transform:translate3d(0,100%,0)}}.fadeOutDown{-webkit-animation-name:fadeOutDown;animation-name:fadeOutDown}@-webkit-keyframes fadeOutDownBig{0%{opacity:1}to{-webkit-transform:translate3d(0,2000px,0);opacity:0;transform:translate3d(0,2000px,0)}}@keyframes fadeOutDownBig{0%{opacity:1}to{-webkit-transform:translate3d(0,2000px,0);opacity:0;transform:translate3d(0,2000px,0)}}.fadeOutDownBig{-webkit-animation-name:fadeOutDownBig;animation-name:fadeOutDownBig}@-webkit-keyframes fadeOutLeft{0%{opacity:1}to{-webkit-transform:translate3d(-100%,0,0);opacity:0;transform:translate3d(-100%,0,0)}}@keyframes fadeOutLeft{0%{opacity:1}to{-webkit-transform:translate3d(-100%,0,0);opacity:0;transform:translate3d(-100%,0,0)}}.fadeOutLeft{-webkit-animation-name:fadeOutLeft;animation-name:fadeOutLeft}@-webkit-keyframes fadeOutLeftBig{0%{opacity:1}to{-webkit-transform:translate3d(-2000px,0,0);opacity:0;transform:translate3d(-2000px,0,0)}}@keyframes fadeOutLeftBig{0%{opacity:1}to{-webkit-transform:translate3d(-2000px,0,0);opacity:0;transform:translate3d(-2000px,0,0)}}.fadeOutLeftBig{-webkit-animation-name:fadeOutLeftBig;animation-name:fadeOutLeftBig}@-webkit-keyframes fadeOutRight{0%{opacity:1}to{-webkit-transform:translate3d(100%,0,0);opacity:0;transform:translate3d(100%,0,0)}}@keyframes fadeOutRight{0%{opacity:1}to{-webkit-transform:translate3d(100%,0,0);opacity:0;transform:translate3d(100%,0,0)}}.fadeOutRight{-webkit-animation-name:fadeOutRight;animation-name:fadeOutRight}@-webkit-keyframes fadeOutRightBig{0%{opacity:1}to{-webkit-transform:translate3d(2000px,0,0);opacity:0;transform:translate3d(2000px,0,0)}}@keyframes fadeOutRightBig{0%{opacity:1}to{-webkit-transform:translate3d(2000px,0,0);opacity:0;transform:translate3d(2000px,0,0)}}.fadeOutRightBig{-webkit-animation-name:fadeOutRightBig;animation-name:fadeOutRightBig}@-webkit-keyframes fadeOutUp{0%{opacity:1}to{-webkit-transform:translate3d(0,-100%,0);opacity:0;transform:translate3d(0,-100%,0)}}@keyframes fadeOutUp{0%{opacity:1}to{-webkit-transform:translate3d(0,-100%,0);opacity:0;transform:translate3d(0,-100%,0)}}.fadeOutUp{-webkit-animation-name:fadeOutUp;animation-name:fadeOutUp}@-webkit-keyframes fadeOutUpBig{0%{opacity:1}to{-webkit-transform:translate3d(0,-2000px,0);opacity:0;transform:translate3d(0,-2000px,0)}}@keyframes fadeOutUpBig{0%{opacity:1}to{-webkit-transform:translate3d(0,-2000px,0);opacity:0;transform:translate3d(0,-2000px,0)}}.fadeOutUpBig{-webkit-animation-name:fadeOutUpBig;animation-name:fadeOutUpBig}@-webkit-keyframes flip{0%{-webkit-animation-timing-function:ease-out;-webkit-transform:perspective(400px) scaleX(1) translateZ(0) rotateY(-1turn);animation-timing-function:ease-out;transform:perspective(400px) scaleX(1) translateZ(0) rotateY(-1turn)}40%{-webkit-animation-timing-function:ease-out;-webkit-transform:perspective(400px) scaleX(1) translateZ(150px) rotateY(-190deg);animation-timing-function:ease-out;transform:perspective(400px) scaleX(1) translateZ(150px) rotateY(-190deg)}50%{-webkit-animation-timing-function:ease-in;-webkit-transform:perspective(400px) scaleX(1) translateZ(150px) rotateY(-170deg);animation-timing-function:ease-in;transform:perspective(400px) scaleX(1) translateZ(150px) rotateY(-170deg)}80%{-webkit-animation-timing-function:ease-in;-webkit-transform:perspective(400px) scale3d(.95,.95,.95) translateZ(0) rotateY(0);animation-timing-function:ease-in;transform:perspective(400px) scale3d(.95,.95,.95) translateZ(0) rotateY(0)}to{-webkit-animation-timing-function:ease-in;-webkit-transform:perspective(400px) scaleX(1) translateZ(0) rotateY(0);animation-timing-function:ease-in;transform:perspective(400px) scaleX(1) translateZ(0) rotateY(0)}}@keyframes flip{0%{-webkit-animation-timing-function:ease-out;-webkit-transform:perspective(400px) scaleX(1) translateZ(0) rotateY(-1turn);animation-timing-function:ease-out;transform:perspective(400px) scaleX(1) translateZ(0) rotateY(-1turn)}40%{-webkit-animation-timing-function:ease-out;-webkit-transform:perspective(400px) scaleX(1) translateZ(150px) rotateY(-190deg);animation-timing-function:ease-out;transform:perspective(400px) scaleX(1) translateZ(150px) rotateY(-190deg)}50%{-webkit-animation-timing-function:ease-in;-webkit-transform:perspective(400px) scaleX(1) translateZ(150px) rotateY(-170deg);animation-timing-function:ease-in;transform:perspective(400px) scaleX(1) translateZ(150px) rotateY(-170deg)}80%{-webkit-animation-timing-function:ease-in;-webkit-transform:perspective(400px) scale3d(.95,.95,.95) translateZ(0) rotateY(0);animation-timing-function:ease-in;transform:perspective(400px) scale3d(.95,.95,.95) translateZ(0) rotateY(0)}to{-webkit-animation-timing-function:ease-in;-webkit-transform:perspective(400px) scaleX(1) translateZ(0) rotateY(0);animation-timing-function:ease-in;transform:perspective(400px) scaleX(1) translateZ(0) rotateY(0)}}.animated.flip{-webkit-animation-name:flip;-webkit-backface-visibility:visible;animation-name:flip;backface-visibility:visible}@-webkit-keyframes flipInX{0%{-webkit-animation-timing-function:ease-in;-webkit-transform:perspective(400px) rotateX(90deg);animation-timing-function:ease-in;opacity:0;transform:perspective(400px) rotateX(90deg)}40%{-webkit-animation-timing-function:ease-in;-webkit-transform:perspective(400px) rotateX(-20deg);animation-timing-function:ease-in;transform:perspective(400px) rotateX(-20deg)}60%{-webkit-transform:perspective(400px) rotateX(10deg);opacity:1;transform:perspective(400px) rotateX(10deg)}80%{-webkit-transform:perspective(400px) rotateX(-5deg);transform:perspective(400px) rotateX(-5deg)}to{-webkit-transform:perspective(400px);transform:perspective(400px)}}@keyframes flipInX{0%{-webkit-animation-timing-function:ease-in;-webkit-transform:perspective(400px) rotateX(90deg);animation-timing-function:ease-in;opacity:0;transform:perspective(400px) rotateX(90deg)}40%{-webkit-animation-timing-function:ease-in;-webkit-transform:perspective(400px) rotateX(-20deg);animation-timing-function:ease-in;transform:perspective(400px) rotateX(-20deg)}60%{-webkit-transform:perspective(400px) rotateX(10deg);opacity:1;transform:perspective(400px) rotateX(10deg)}80%{-webkit-transform:perspective(400px) rotateX(-5deg);transform:perspective(400px) rotateX(-5deg)}to{-webkit-transform:perspective(400px);transform:perspective(400px)}}.flipInX{-webkit-animation-name:flipInX;-webkit-backface-visibility:visible!important;animation-name:flipInX;backface-visibility:visible!important}@-webkit-keyframes flipInY{0%{-webkit-animation-timing-function:ease-in;-webkit-transform:perspective(400px) rotateY(90deg);animation-timing-function:ease-in;opacity:0;transform:perspective(400px) rotateY(90deg)}40%{-webkit-animation-timing-function:ease-in;-webkit-transform:perspective(400px) rotateY(-20deg);animation-timing-function:ease-in;transform:perspective(400px) rotateY(-20deg)}60%{-webkit-transform:perspective(400px) rotateY(10deg);opacity:1;transform:perspective(400px) rotateY(10deg)}80%{-webkit-transform:perspective(400px) rotateY(-5deg);transform:perspective(400px) rotateY(-5deg)}to{-webkit-transform:perspective(400px);transform:perspective(400px)}}@keyframes flipInY{0%{-webkit-animation-timing-function:ease-in;-webkit-transform:perspective(400px) rotateY(90deg);animation-timing-function:ease-in;opacity:0;transform:perspective(400px) rotateY(90deg)}40%{-webkit-animation-timing-function:ease-in;-webkit-transform:perspective(400px) rotateY(-20deg);animation-timing-function:ease-in;transform:perspective(400px) rotateY(-20deg)}60%{-webkit-transform:perspective(400px) rotateY(10deg);opacity:1;transform:perspective(400px) rotateY(10deg)}80%{-webkit-transform:perspective(400px) rotateY(-5deg);transform:perspective(400px) rotateY(-5deg)}to{-webkit-transform:perspective(400px);transform:perspective(400px)}}.flipInY{-webkit-animation-name:flipInY;-webkit-backface-visibility:visible!important;animation-name:flipInY;backface-visibility:visible!important}@-webkit-keyframes flipOutX{0%{-webkit-transform:perspective(400px);transform:perspective(400px)}30%{-webkit-transform:perspective(400px) rotateX(-20deg);opacity:1;transform:perspective(400px) rotateX(-20deg)}to{-webkit-transform:perspective(400px) rotateX(90deg);opacity:0;transform:perspective(400px) rotateX(90deg)}}@keyframes flipOutX{0%{-webkit-transform:perspective(400px);transform:perspective(400px)}30%{-webkit-transform:perspective(400px) rotateX(-20deg);opacity:1;transform:perspective(400px) rotateX(-20deg)}to{-webkit-transform:perspective(400px) rotateX(90deg);opacity:0;transform:perspective(400px) rotateX(90deg)}}.flipOutX{-webkit-animation-duration:.75s;-webkit-animation-name:flipOutX;-webkit-backface-visibility:visible!important;animation-duration:.75s;animation-name:flipOutX;backface-visibility:visible!important}@-webkit-keyframes flipOutY{0%{-webkit-transform:perspective(400px);transform:perspective(400px)}30%{-webkit-transform:perspective(400px) rotateY(-15deg);opacity:1;transform:perspective(400px) rotateY(-15deg)}to{-webkit-transform:perspective(400px) rotateY(90deg);opacity:0;transform:perspective(400px) rotateY(90deg)}}@keyframes flipOutY{0%{-webkit-transform:perspective(400px);transform:perspective(400px)}30%{-webkit-transform:perspective(400px) rotateY(-15deg);opacity:1;transform:perspective(400px) rotateY(-15deg)}to{-webkit-transform:perspective(400px) rotateY(90deg);opacity:0;transform:perspective(400px) rotateY(90deg)}}.flipOutY{-webkit-animation-duration:.75s;-webkit-animation-name:flipOutY;-webkit-backface-visibility:visible!important;animation-duration:.75s;animation-name:flipOutY;backface-visibility:visible!important}@-webkit-keyframes lightSpeedIn{0%{-webkit-transform:translate3d(100%,0,0) skewX(-30deg);opacity:0;transform:translate3d(100%,0,0) skewX(-30deg)}60%{-webkit-transform:skewX(20deg);opacity:1;transform:skewX(20deg)}80%{-webkit-transform:skewX(-5deg);transform:skewX(-5deg)}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}@keyframes lightSpeedIn{0%{-webkit-transform:translate3d(100%,0,0) skewX(-30deg);opacity:0;transform:translate3d(100%,0,0) skewX(-30deg)}60%{-webkit-transform:skewX(20deg);opacity:1;transform:skewX(20deg)}80%{-webkit-transform:skewX(-5deg);transform:skewX(-5deg)}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}.lightSpeedIn{-webkit-animation-name:lightSpeedIn;-webkit-animation-timing-function:ease-out;animation-name:lightSpeedIn;animation-timing-function:ease-out}@-webkit-keyframes lightSpeedOut{0%{opacity:1}to{-webkit-transform:translate3d(100%,0,0) skewX(30deg);opacity:0;transform:translate3d(100%,0,0) skewX(30deg)}}@keyframes lightSpeedOut{0%{opacity:1}to{-webkit-transform:translate3d(100%,0,0) skewX(30deg);opacity:0;transform:translate3d(100%,0,0) skewX(30deg)}}.lightSpeedOut{-webkit-animation-name:lightSpeedOut;-webkit-animation-timing-function:ease-in;animation-name:lightSpeedOut;animation-timing-function:ease-in}@-webkit-keyframes rotateIn{0%{-webkit-transform:rotate(-200deg);-webkit-transform-origin:center;opacity:0;transform:rotate(-200deg);transform-origin:center}to{-webkit-transform:translateZ(0);-webkit-transform-origin:center;opacity:1;transform:translateZ(0);transform-origin:center}}@keyframes rotateIn{0%{-webkit-transform:rotate(-200deg);-webkit-transform-origin:center;opacity:0;transform:rotate(-200deg);transform-origin:center}to{-webkit-transform:translateZ(0);-webkit-transform-origin:center;opacity:1;transform:translateZ(0);transform-origin:center}}.rotateIn{-webkit-animation-name:rotateIn;animation-name:rotateIn}@-webkit-keyframes rotateInDownLeft{0%{-webkit-transform:rotate(-45deg);-webkit-transform-origin:left bottom;opacity:0;transform:rotate(-45deg);transform-origin:left bottom}to{-webkit-transform:translateZ(0);-webkit-transform-origin:left bottom;opacity:1;transform:translateZ(0);transform-origin:left bottom}}@keyframes rotateInDownLeft{0%{-webkit-transform:rotate(-45deg);-webkit-transform-origin:left bottom;opacity:0;transform:rotate(-45deg);transform-origin:left bottom}to{-webkit-transform:translateZ(0);-webkit-transform-origin:left bottom;opacity:1;transform:translateZ(0);transform-origin:left bottom}}.rotateInDownLeft{-webkit-animation-name:rotateInDownLeft;animation-name:rotateInDownLeft}@-webkit-keyframes rotateInDownRight{0%{-webkit-transform:rotate(45deg);-webkit-transform-origin:right bottom;opacity:0;transform:rotate(45deg);transform-origin:right bottom}to{-webkit-transform:translateZ(0);-webkit-transform-origin:right bottom;opacity:1;transform:translateZ(0);transform-origin:right bottom}}@keyframes rotateInDownRight{0%{-webkit-transform:rotate(45deg);-webkit-transform-origin:right bottom;opacity:0;transform:rotate(45deg);transform-origin:right bottom}to{-webkit-transform:translateZ(0);-webkit-transform-origin:right bottom;opacity:1;transform:translateZ(0);transform-origin:right bottom}}.rotateInDownRight{-webkit-animation-name:rotateInDownRight;animation-name:rotateInDownRight}@-webkit-keyframes rotateInUpLeft{0%{-webkit-transform:rotate(45deg);-webkit-transform-origin:left bottom;opacity:0;transform:rotate(45deg);transform-origin:left bottom}to{-webkit-transform:translateZ(0);-webkit-transform-origin:left bottom;opacity:1;transform:translateZ(0);transform-origin:left bottom}}@keyframes rotateInUpLeft{0%{-webkit-transform:rotate(45deg);-webkit-transform-origin:left bottom;opacity:0;transform:rotate(45deg);transform-origin:left bottom}to{-webkit-transform:translateZ(0);-webkit-transform-origin:left bottom;opacity:1;transform:translateZ(0);transform-origin:left bottom}}.rotateInUpLeft{-webkit-animation-name:rotateInUpLeft;animation-name:rotateInUpLeft}@-webkit-keyframes rotateInUpRight{0%{-webkit-transform:rotate(-90deg);-webkit-transform-origin:right bottom;opacity:0;transform:rotate(-90deg);transform-origin:right bottom}to{-webkit-transform:translateZ(0);-webkit-transform-origin:right bottom;opacity:1;transform:translateZ(0);transform-origin:right bottom}}@keyframes rotateInUpRight{0%{-webkit-transform:rotate(-90deg);-webkit-transform-origin:right bottom;opacity:0;transform:rotate(-90deg);transform-origin:right bottom}to{-webkit-transform:translateZ(0);-webkit-transform-origin:right bottom;opacity:1;transform:translateZ(0);transform-origin:right bottom}}.rotateInUpRight{-webkit-animation-name:rotateInUpRight;animation-name:rotateInUpRight}@-webkit-keyframes rotateOut{0%{-webkit-transform-origin:center;opacity:1;transform-origin:center}to{-webkit-transform:rotate(200deg);-webkit-transform-origin:center;opacity:0;transform:rotate(200deg);transform-origin:center}}@keyframes rotateOut{0%{-webkit-transform-origin:center;opacity:1;transform-origin:center}to{-webkit-transform:rotate(200deg);-webkit-transform-origin:center;opacity:0;transform:rotate(200deg);transform-origin:center}}.rotateOut{-webkit-animation-name:rotateOut;animation-name:rotateOut}@-webkit-keyframes rotateOutDownLeft{0%{-webkit-transform-origin:left bottom;opacity:1;transform-origin:left bottom}to{-webkit-transform:rotate(45deg);-webkit-transform-origin:left bottom;opacity:0;transform:rotate(45deg);transform-origin:left bottom}}@keyframes rotateOutDownLeft{0%{-webkit-transform-origin:left bottom;opacity:1;transform-origin:left bottom}to{-webkit-transform:rotate(45deg);-webkit-transform-origin:left bottom;opacity:0;transform:rotate(45deg);transform-origin:left bottom}}.rotateOutDownLeft{-webkit-animation-name:rotateOutDownLeft;animation-name:rotateOutDownLeft}@-webkit-keyframes rotateOutDownRight{0%{-webkit-transform-origin:right bottom;opacity:1;transform-origin:right bottom}to{-webkit-transform:rotate(-45deg);-webkit-transform-origin:right bottom;opacity:0;transform:rotate(-45deg);transform-origin:right bottom}}@keyframes rotateOutDownRight{0%{-webkit-transform-origin:right bottom;opacity:1;transform-origin:right bottom}to{-webkit-transform:rotate(-45deg);-webkit-transform-origin:right bottom;opacity:0;transform:rotate(-45deg);transform-origin:right bottom}}.rotateOutDownRight{-webkit-animation-name:rotateOutDownRight;animation-name:rotateOutDownRight}@-webkit-keyframes rotateOutUpLeft{0%{-webkit-transform-origin:left bottom;opacity:1;transform-origin:left bottom}to{-webkit-transform:rotate(-45deg);-webkit-transform-origin:left bottom;opacity:0;transform:rotate(-45deg);transform-origin:left bottom}}@keyframes rotateOutUpLeft{0%{-webkit-transform-origin:left bottom;opacity:1;transform-origin:left bottom}to{-webkit-transform:rotate(-45deg);-webkit-transform-origin:left bottom;opacity:0;transform:rotate(-45deg);transform-origin:left bottom}}.rotateOutUpLeft{-webkit-animation-name:rotateOutUpLeft;animation-name:rotateOutUpLeft}@-webkit-keyframes rotateOutUpRight{0%{-webkit-transform-origin:right bottom;opacity:1;transform-origin:right bottom}to{-webkit-transform:rotate(90deg);-webkit-transform-origin:right bottom;opacity:0;transform:rotate(90deg);transform-origin:right bottom}}@keyframes rotateOutUpRight{0%{-webkit-transform-origin:right bottom;opacity:1;transform-origin:right bottom}to{-webkit-transform:rotate(90deg);-webkit-transform-origin:right bottom;opacity:0;transform:rotate(90deg);transform-origin:right bottom}}.rotateOutUpRight{-webkit-animation-name:rotateOutUpRight;animation-name:rotateOutUpRight}@-webkit-keyframes hinge{0%{-webkit-animation-timing-function:ease-in-out;-webkit-transform-origin:top left;animation-timing-function:ease-in-out;transform-origin:top left}20%,60%{-webkit-animation-timing-function:ease-in-out;-webkit-transform:rotate(80deg);-webkit-transform-origin:top left;animation-timing-function:ease-in-out;transform:rotate(80deg);transform-origin:top left}40%,80%{-webkit-animation-timing-function:ease-in-out;-webkit-transform:rotate(60deg);-webkit-transform-origin:top left;animation-timing-function:ease-in-out;opacity:1;transform:rotate(60deg);transform-origin:top left}to{-webkit-transform:translate3d(0,700px,0);opacity:0;transform:translate3d(0,700px,0)}}@keyframes hinge{0%{-webkit-animation-timing-function:ease-in-out;-webkit-transform-origin:top left;animation-timing-function:ease-in-out;transform-origin:top left}20%,60%{-webkit-animation-timing-function:ease-in-out;-webkit-transform:rotate(80deg);-webkit-transform-origin:top left;animation-timing-function:ease-in-out;transform:rotate(80deg);transform-origin:top left}40%,80%{-webkit-animation-timing-function:ease-in-out;-webkit-transform:rotate(60deg);-webkit-transform-origin:top left;animation-timing-function:ease-in-out;opacity:1;transform:rotate(60deg);transform-origin:top left}to{-webkit-transform:translate3d(0,700px,0);opacity:0;transform:translate3d(0,700px,0)}}.hinge{-webkit-animation-duration:2s;-webkit-animation-name:hinge;animation-duration:2s;animation-name:hinge}@-webkit-keyframes jackInTheBox{0%{-webkit-transform:scale(.1) rotate(30deg);-webkit-transform-origin:center bottom;opacity:0;transform:scale(.1) rotate(30deg);transform-origin:center bottom}50%{-webkit-transform:rotate(-10deg);transform:rotate(-10deg)}70%{-webkit-transform:rotate(3deg);transform:rotate(3deg)}to{-webkit-transform:scale(1);opacity:1;transform:scale(1)}}@keyframes jackInTheBox{0%{-webkit-transform:scale(.1) rotate(30deg);-webkit-transform-origin:center bottom;opacity:0;transform:scale(.1) rotate(30deg);transform-origin:center bottom}50%{-webkit-transform:rotate(-10deg);transform:rotate(-10deg)}70%{-webkit-transform:rotate(3deg);transform:rotate(3deg)}to{-webkit-transform:scale(1);opacity:1;transform:scale(1)}}.jackInTheBox{-webkit-animation-name:jackInTheBox;animation-name:jackInTheBox}@-webkit-keyframes rollIn{0%{-webkit-transform:translate3d(-100%,0,0) rotate(-120deg);opacity:0;transform:translate3d(-100%,0,0) rotate(-120deg)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}@keyframes rollIn{0%{-webkit-transform:translate3d(-100%,0,0) rotate(-120deg);opacity:0;transform:translate3d(-100%,0,0) rotate(-120deg)}to{-webkit-transform:translateZ(0);opacity:1;transform:translateZ(0)}}.rollIn{-webkit-animation-name:rollIn;animation-name:rollIn}@-webkit-keyframes rollOut{0%{opacity:1}to{-webkit-transform:translate3d(100%,0,0) rotate(120deg);opacity:0;transform:translate3d(100%,0,0) rotate(120deg)}}@keyframes rollOut{0%{opacity:1}to{-webkit-transform:translate3d(100%,0,0) rotate(120deg);opacity:0;transform:translate3d(100%,0,0) rotate(120deg)}}.rollOut{-webkit-animation-name:rollOut;animation-name:rollOut}@-webkit-keyframes zoomIn{0%{-webkit-transform:scale3d(.3,.3,.3);opacity:0;transform:scale3d(.3,.3,.3)}50%{opacity:1}}@keyframes zoomIn{0%{-webkit-transform:scale3d(.3,.3,.3);opacity:0;transform:scale3d(.3,.3,.3)}50%{opacity:1}}.zoomIn{-webkit-animation-name:zoomIn;animation-name:zoomIn}@-webkit-keyframes zoomInDown{0%{-webkit-animation-timing-function:cubic-bezier(.55,.055,.675,.19);-webkit-transform:scale3d(.1,.1,.1) translate3d(0,-1000px,0);animation-timing-function:cubic-bezier(.55,.055,.675,.19);opacity:0;transform:scale3d(.1,.1,.1) translate3d(0,-1000px,0)}60%{-webkit-animation-timing-function:cubic-bezier(.175,.885,.32,1);-webkit-transform:scale3d(.475,.475,.475) translate3d(0,60px,0);animation-timing-function:cubic-bezier(.175,.885,.32,1);opacity:1;transform:scale3d(.475,.475,.475) translate3d(0,60px,0)}}@keyframes zoomInDown{0%{-webkit-animation-timing-function:cubic-bezier(.55,.055,.675,.19);-webkit-transform:scale3d(.1,.1,.1) translate3d(0,-1000px,0);animation-timing-function:cubic-bezier(.55,.055,.675,.19);opacity:0;transform:scale3d(.1,.1,.1) translate3d(0,-1000px,0)}60%{-webkit-animation-timing-function:cubic-bezier(.175,.885,.32,1);-webkit-transform:scale3d(.475,.475,.475) translate3d(0,60px,0);animation-timing-function:cubic-bezier(.175,.885,.32,1);opacity:1;transform:scale3d(.475,.475,.475) translate3d(0,60px,0)}}.zoomInDown{-webkit-animation-name:zoomInDown;animation-name:zoomInDown}@-webkit-keyframes zoomInLeft{0%{-webkit-animation-timing-function:cubic-bezier(.55,.055,.675,.19);-webkit-transform:scale3d(.1,.1,.1) translate3d(-1000px,0,0);animation-timing-function:cubic-bezier(.55,.055,.675,.19);opacity:0;transform:scale3d(.1,.1,.1) translate3d(-1000px,0,0)}60%{-webkit-animation-timing-function:cubic-bezier(.175,.885,.32,1);-webkit-transform:scale3d(.475,.475,.475) translate3d(10px,0,0);animation-timing-function:cubic-bezier(.175,.885,.32,1);opacity:1;transform:scale3d(.475,.475,.475) translate3d(10px,0,0)}}@keyframes zoomInLeft{0%{-webkit-animation-timing-function:cubic-bezier(.55,.055,.675,.19);-webkit-transform:scale3d(.1,.1,.1) translate3d(-1000px,0,0);animation-timing-function:cubic-bezier(.55,.055,.675,.19);opacity:0;transform:scale3d(.1,.1,.1) translate3d(-1000px,0,0)}60%{-webkit-animation-timing-function:cubic-bezier(.175,.885,.32,1);-webkit-transform:scale3d(.475,.475,.475) translate3d(10px,0,0);animation-timing-function:cubic-bezier(.175,.885,.32,1);opacity:1;transform:scale3d(.475,.475,.475) translate3d(10px,0,0)}}.zoomInLeft{-webkit-animation-name:zoomInLeft;animation-name:zoomInLeft}@-webkit-keyframes zoomInRight{0%{-webkit-animation-timing-function:cubic-bezier(.55,.055,.675,.19);-webkit-transform:scale3d(.1,.1,.1) translate3d(1000px,0,0);animation-timing-function:cubic-bezier(.55,.055,.675,.19);opacity:0;transform:scale3d(.1,.1,.1) translate3d(1000px,0,0)}60%{-webkit-animation-timing-function:cubic-bezier(.175,.885,.32,1);-webkit-transform:scale3d(.475,.475,.475) translate3d(-10px,0,0);animation-timing-function:cubic-bezier(.175,.885,.32,1);opacity:1;transform:scale3d(.475,.475,.475) translate3d(-10px,0,0)}}@keyframes zoomInRight{0%{-webkit-animation-timing-function:cubic-bezier(.55,.055,.675,.19);-webkit-transform:scale3d(.1,.1,.1) translate3d(1000px,0,0);animation-timing-function:cubic-bezier(.55,.055,.675,.19);opacity:0;transform:scale3d(.1,.1,.1) translate3d(1000px,0,0)}60%{-webkit-animation-timing-function:cubic-bezier(.175,.885,.32,1);-webkit-transform:scale3d(.475,.475,.475) translate3d(-10px,0,0);animation-timing-function:cubic-bezier(.175,.885,.32,1);opacity:1;transform:scale3d(.475,.475,.475) translate3d(-10px,0,0)}}.zoomInRight{-webkit-animation-name:zoomInRight;animation-name:zoomInRight}@-webkit-keyframes zoomInUp{0%{-webkit-animation-timing-function:cubic-bezier(.55,.055,.675,.19);-webkit-transform:scale3d(.1,.1,.1) translate3d(0,1000px,0);animation-timing-function:cubic-bezier(.55,.055,.675,.19);opacity:0;transform:scale3d(.1,.1,.1) translate3d(0,1000px,0)}60%{-webkit-animation-timing-function:cubic-bezier(.175,.885,.32,1);-webkit-transform:scale3d(.475,.475,.475) translate3d(0,-60px,0);animation-timing-function:cubic-bezier(.175,.885,.32,1);opacity:1;transform:scale3d(.475,.475,.475) translate3d(0,-60px,0)}}@keyframes zoomInUp{0%{-webkit-animation-timing-function:cubic-bezier(.55,.055,.675,.19);-webkit-transform:scale3d(.1,.1,.1) translate3d(0,1000px,0);animation-timing-function:cubic-bezier(.55,.055,.675,.19);opacity:0;transform:scale3d(.1,.1,.1) translate3d(0,1000px,0)}60%{-webkit-animation-timing-function:cubic-bezier(.175,.885,.32,1);-webkit-transform:scale3d(.475,.475,.475) translate3d(0,-60px,0);animation-timing-function:cubic-bezier(.175,.885,.32,1);opacity:1;transform:scale3d(.475,.475,.475) translate3d(0,-60px,0)}}.zoomInUp{-webkit-animation-name:zoomInUp;animation-name:zoomInUp}@-webkit-keyframes zoomOut{0%{opacity:1}50%{-webkit-transform:scale3d(.3,.3,.3);opacity:0;transform:scale3d(.3,.3,.3)}to{opacity:0}}@keyframes zoomOut{0%{opacity:1}50%{-webkit-transform:scale3d(.3,.3,.3);opacity:0;transform:scale3d(.3,.3,.3)}to{opacity:0}}.zoomOut{-webkit-animation-name:zoomOut;animation-name:zoomOut}@-webkit-keyframes zoomOutDown{40%{-webkit-animation-timing-function:cubic-bezier(.55,.055,.675,.19);-webkit-transform:scale3d(.475,.475,.475) translate3d(0,-60px,0);animation-timing-function:cubic-bezier(.55,.055,.675,.19);opacity:1;transform:scale3d(.475,.475,.475) translate3d(0,-60px,0)}to{-webkit-animation-timing-function:cubic-bezier(.175,.885,.32,1);-webkit-transform:scale3d(.1,.1,.1) translate3d(0,2000px,0);-webkit-transform-origin:center bottom;animation-timing-function:cubic-bezier(.175,.885,.32,1);opacity:0;transform:scale3d(.1,.1,.1) translate3d(0,2000px,0);transform-origin:center bottom}}@keyframes zoomOutDown{40%{-webkit-animation-timing-function:cubic-bezier(.55,.055,.675,.19);-webkit-transform:scale3d(.475,.475,.475) translate3d(0,-60px,0);animation-timing-function:cubic-bezier(.55,.055,.675,.19);opacity:1;transform:scale3d(.475,.475,.475) translate3d(0,-60px,0)}to{-webkit-animation-timing-function:cubic-bezier(.175,.885,.32,1);-webkit-transform:scale3d(.1,.1,.1) translate3d(0,2000px,0);-webkit-transform-origin:center bottom;animation-timing-function:cubic-bezier(.175,.885,.32,1);opacity:0;transform:scale3d(.1,.1,.1) translate3d(0,2000px,0);transform-origin:center bottom}}.zoomOutDown{-webkit-animation-name:zoomOutDown;animation-name:zoomOutDown}@-webkit-keyframes zoomOutLeft{40%{-webkit-transform:scale3d(.475,.475,.475) translate3d(42px,0,0);opacity:1;transform:scale3d(.475,.475,.475) translate3d(42px,0,0)}to{-webkit-transform:scale(.1) translate3d(-2000px,0,0);-webkit-transform-origin:left center;opacity:0;transform:scale(.1) translate3d(-2000px,0,0);transform-origin:left center}}@keyframes zoomOutLeft{40%{-webkit-transform:scale3d(.475,.475,.475) translate3d(42px,0,0);opacity:1;transform:scale3d(.475,.475,.475) translate3d(42px,0,0)}to{-webkit-transform:scale(.1) translate3d(-2000px,0,0);-webkit-transform-origin:left center;opacity:0;transform:scale(.1) translate3d(-2000px,0,0);transform-origin:left center}}.zoomOutLeft{-webkit-animation-name:zoomOutLeft;animation-name:zoomOutLeft}@-webkit-keyframes zoomOutRight{40%{-webkit-transform:scale3d(.475,.475,.475) translate3d(-42px,0,0);opacity:1;transform:scale3d(.475,.475,.475) translate3d(-42px,0,0)}to{-webkit-transform:scale(.1) translate3d(2000px,0,0);-webkit-transform-origin:right center;opacity:0;transform:scale(.1) translate3d(2000px,0,0);transform-origin:right center}}@keyframes zoomOutRight{40%{-webkit-transform:scale3d(.475,.475,.475) translate3d(-42px,0,0);opacity:1;transform:scale3d(.475,.475,.475) translate3d(-42px,0,0)}to{-webkit-transform:scale(.1) translate3d(2000px,0,0);-webkit-transform-origin:right center;opacity:0;transform:scale(.1) translate3d(2000px,0,0);transform-origin:right center}}.zoomOutRight{-webkit-animation-name:zoomOutRight;animation-name:zoomOutRight}@-webkit-keyframes zoomOutUp{40%{-webkit-animation-timing-function:cubic-bezier(.55,.055,.675,.19);-webkit-transform:scale3d(.475,.475,.475) translate3d(0,60px,0);animation-timing-function:cubic-bezier(.55,.055,.675,.19);opacity:1;transform:scale3d(.475,.475,.475) translate3d(0,60px,0)}to{-webkit-animation-timing-function:cubic-bezier(.175,.885,.32,1);-webkit-transform:scale3d(.1,.1,.1) translate3d(0,-2000px,0);-webkit-transform-origin:center bottom;animation-timing-function:cubic-bezier(.175,.885,.32,1);opacity:0;transform:scale3d(.1,.1,.1) translate3d(0,-2000px,0);transform-origin:center bottom}}@keyframes zoomOutUp{40%{-webkit-animation-timing-function:cubic-bezier(.55,.055,.675,.19);-webkit-transform:scale3d(.475,.475,.475) translate3d(0,60px,0);animation-timing-function:cubic-bezier(.55,.055,.675,.19);opacity:1;transform:scale3d(.475,.475,.475) translate3d(0,60px,0)}to{-webkit-animation-timing-function:cubic-bezier(.175,.885,.32,1);-webkit-transform:scale3d(.1,.1,.1) translate3d(0,-2000px,0);-webkit-transform-origin:center bottom;animation-timing-function:cubic-bezier(.175,.885,.32,1);opacity:0;transform:scale3d(.1,.1,.1) translate3d(0,-2000px,0);transform-origin:center bottom}}.zoomOutUp{-webkit-animation-name:zoomOutUp;animation-name:zoomOutUp}@-webkit-keyframes slideInDown{0%{-webkit-transform:translate3d(0,-100%,0);transform:translate3d(0,-100%,0);visibility:visible}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}@keyframes slideInDown{0%{-webkit-transform:translate3d(0,-100%,0);transform:translate3d(0,-100%,0);visibility:visible}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}.slideInDown{-webkit-animation-name:slideInDown;animation-name:slideInDown}@-webkit-keyframes slideInLeft{0%{-webkit-transform:translate3d(-100%,0,0);transform:translate3d(-100%,0,0);visibility:visible}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}@keyframes slideInLeft{0%{-webkit-transform:translate3d(-100%,0,0);transform:translate3d(-100%,0,0);visibility:visible}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}.slideInLeft{-webkit-animation-name:slideInLeft;animation-name:slideInLeft}@-webkit-keyframes slideInRight{0%{-webkit-transform:translate3d(100%,0,0);transform:translate3d(100%,0,0);visibility:visible}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}@keyframes slideInRight{0%{-webkit-transform:translate3d(100%,0,0);transform:translate3d(100%,0,0);visibility:visible}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}.slideInRight{-webkit-animation-name:slideInRight;animation-name:slideInRight}@-webkit-keyframes slideInUp{0%{-webkit-transform:translate3d(0,100%,0);transform:translate3d(0,100%,0);visibility:visible}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}@keyframes slideInUp{0%{-webkit-transform:translate3d(0,100%,0);transform:translate3d(0,100%,0);visibility:visible}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}.slideInUp{-webkit-animation-name:slideInUp;animation-name:slideInUp}@-webkit-keyframes slideOutDown{0%{-webkit-transform:translateZ(0);transform:translateZ(0)}to{-webkit-transform:translate3d(0,100%,0);transform:translate3d(0,100%,0);visibility:hidden}}@keyframes slideOutDown{0%{-webkit-transform:translateZ(0);transform:translateZ(0)}to{-webkit-transform:translate3d(0,100%,0);transform:translate3d(0,100%,0);visibility:hidden}}.slideOutDown{-webkit-animation-name:slideOutDown;animation-name:slideOutDown}@-webkit-keyframes slideOutLeft{0%{-webkit-transform:translateZ(0);transform:translateZ(0)}to{-webkit-transform:translate3d(-100%,0,0);transform:translate3d(-100%,0,0);visibility:hidden}}@keyframes slideOutLeft{0%{-webkit-transform:translateZ(0);transform:translateZ(0)}to{-webkit-transform:translate3d(-100%,0,0);transform:translate3d(-100%,0,0);visibility:hidden}}.slideOutLeft{-webkit-animation-name:slideOutLeft;animation-name:slideOutLeft}@-webkit-keyframes slideOutRight{0%{-webkit-transform:translateZ(0);transform:translateZ(0)}to{-webkit-transform:translate3d(100%,0,0);transform:translate3d(100%,0,0);visibility:hidden}}@keyframes slideOutRight{0%{-webkit-transform:translateZ(0);transform:translateZ(0)}to{-webkit-transform:translate3d(100%,0,0);transform:translate3d(100%,0,0);visibility:hidden}}.slideOutRight{-webkit-animation-name:slideOutRight;animation-name:slideOutRight}@-webkit-keyframes slideOutUp{0%{-webkit-transform:translateZ(0);transform:translateZ(0)}to{-webkit-transform:translate3d(0,-100%,0);transform:translate3d(0,-100%,0);visibility:hidden}}@keyframes slideOutUp{0%{-webkit-transform:translateZ(0);transform:translateZ(0)}to{-webkit-transform:translate3d(0,-100%,0);transform:translate3d(0,-100%,0);visibility:hidden}}.slideOutUp{-webkit-animation-name:slideOutUp;animation-name:slideOutUp}.animated{-webkit-animation-duration:1s;-webkit-animation-fill-mode:both;animation-duration:1s;animation-fill-mode:both}.animated.infinite{-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite}.animated.delay-1s{-webkit-animation-delay:1s;animation-delay:1s}.animated.delay-2s{-webkit-animation-delay:2s;animation-delay:2s}.animated.delay-3s{-webkit-animation-delay:3s;animation-delay:3s}.animated.delay-4s{-webkit-animation-delay:4s;animation-delay:4s}.animated.delay-5s{-webkit-animation-delay:5s;animation-delay:5s}.animated.fast{-webkit-animation-duration:.8s;animation-duration:.8s}.animated.faster{-webkit-animation-duration:.5s;animation-duration:.5s}.animated.slow{-webkit-animation-duration:2s;animation-duration:2s}.animated.slower{-webkit-animation-duration:3s;animation-duration:3s}@media (prefers-reduced-motion){.animated{-webkit-animation:unset!important;-webkit-transition:none!important;animation:unset!important;transition:none!important}}@font-face{font-family:ActionMan-Bold;src:url(fonts/ActionMan-Bold.eot);src:url(fonts/ActionMan-Bold.eot?#iefix) format('embedded-opentype'),url(fonts/ActionMan-Bold.woff) format('woff'),url(fonts/ActionMan-Bold.ttf) format('truetype');font-weight:400;font-style:normal}@font-face{font-family:Cartwheel;src:url(fonts/Cartwheel_2.eot);src:url(fonts/Cartwheel_2.eot?#iefix) format('embedded-opentype'),url(fonts/Cartwheel_2.woff) format('woff'),url(fonts/Cartwheel_2.ttf) format('truetype');font-weight:400;font-style:normal}@font-face{font-family:'Exo 2';src:url(fonts/Exo2-Bold.eot);src:url(fonts/Exo2-Bold.eot?#iefix) format('embedded-opentype'),url(fonts/Exo2-Bold.woff) format('woff'),url(fonts/Exo2-Bold.ttf) format('truetype');font-weight:700;font-style:normal}@font-face{font-family:'Exo 2 Extra';src:url(fonts/Exo2-ExtraBold.eot);src:url(fonts/Exo2-ExtraBold.eot?#iefix) format('embedded-opentype'),url(fonts/Exo2-ExtraBold.woff) format('woff'),url(fonts/Exo2-ExtraBold.ttf) format('truetype');font-weight:800;font-style:normal}.tossing{animation-name:tossing;-webkit-animation-name:tossing;animation-duration:5s;-webkit-animation-duration:5s;animation-iteration-count:infinite;-webkit-animation-iteration-count:infinite}@keyframes tossing{0%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}100%{transform:rotate(-2deg)}}@-webkit-keyframes tossing{0%{-webkit-transform:rotate(-2deg)}50%{-webkit-transform:rotate(2deg)}100%{-webkit-transform:rotate(-2deg)}}@keyframes hover{20%{transform:translate3d(-3px,0,0)}40%{transform:translate3d(3px,0,0)}60%{transform:translate3d(-3px,0,0)}80%{transform:translate3d(3px,0,0)}}@keyframes tossing2{0%{transform:rotate(0)}50%{transform:rotate(3deg)}75%{transform:rotate(-2deg)}100%{transform:rotate(0)}}@keyframes rotate{0%{transform:rotate(0)}50%{transform:rotate(180deg)}100%{transform:rotate(360deg)}}@-webkit-keyframes tada2{0%{-webkit-transform:scaleX(1);transform:scaleX(1)}10%,20%{-webkit-transform:scale3d(.9,.9,.9) rotate(-3deg);transform:scale3d(.9,.9,.9) rotate(-3deg)}30%,50%,70%,90%{-webkit-transform:scale3d(1.1,1.1,1.1) rotate(3deg);transform:scale3d(1.1,1.1,1.1) rotate(3deg)}40%,60%,80%{-webkit-transform:scale3d(1.1,1.1,1.1) rotate(-3deg);transform:scale3d(1.1,1.1,1.1) rotate(-3deg)}to{-webkit-transform:scaleX(1);transform:scaleX(1)}}@keyframes tada2{0%{-webkit-transform:scaleX(1);transform:scaleX(1)}10%,20%{-webkit-transform:scale3d(.7,.7,.7) rotate(-3deg);transform:scale3d(.7,.7,.7) rotate(-3deg)}30%,50%,70%,90%{-webkit-transform:scale3d(1.3,1.3,1.3) rotate(3deg);transform:scale3d(1.3,1.3,1.3) rotate(3deg)}40%,60%,80%{-webkit-transform:scale3d(1.3,1.3,1.3) rotate(-3deg);transform:scale3d(1.3,1.3,1.3) rotate(-3deg)}to{-webkit-transform:scaleX(1);transform:scaleX(1)}}.tada2{-webkit-animation-name:tada2;animation-name:tada2}body,html{height:100%;font-family:Arial}body{padding:0;margin:0}.blurred{filter:blur(15px);pointer-events:none}#fadeScreen{pointer-events:none;user-select:none;position:absolute;top:0;left:0;width:100%;height:100%;background-color:#000;display:none;z-index:50}#inGameScore{pointer-events:none;user-select:none;position:absolute;top:0;left:0;width:100%;text-align:center;z-index:1;color:#fff;font-weight:700;font-size:36px;border-width:4px;margin-top:8px;display:none;font-family:Cartwheel,'Exo 2 Extra';text-transform:uppercase}@media screen and (max-width:600px),screen and (max-height:767px){#inGameScore{font-size:16px;font-size:3.2vh}}#inGameScore .blue{display:inline-block;background-color:#3b4f8f;border:4px solid #132561;border-radius:12px;padding:0 8px;width:40px}@media screen and (max-width:600px),screen and (max-height:767px){#inGameScore .blue{border:2px solid #132561;border:.4vh solid #132561;width:20px;border-radius:6px;width:4vh;border-radius:1.2vh}}#inGameScore .time{display:inline-block;background-color:#fff;border:4px solid #000;color:#000;padding:0 8px;margin-left:2px;margin-right:2px;width:80px}@media screen and (max-width:600px),screen and (max-height:767px){#inGameScore .time{border:2px solid #000;border:.4vh solid #000;width:40px;width:8vh}}#inGameScore .red{display:inline-block;background-color:#d37647;border:4px solid #8f390d;border-radius:12px;padding:0 8px;width:40px}@media screen and (max-width:600px),screen and (max-height:767px){#inGameScore .red{border:2px solid #8f390d;border:.4vh solid #8f390d;width:20px;border-radius:6px;width:4vh;border-radius:1.2vh}}#inGameScore .blue,#inGameScore .red,#inGameScore .time{vertical-align:middle;padding-bottom:6px}@media screen and (max-width:600px),screen and (max-height:767px){#inGameScore .blue,#inGameScore .red,#inGameScore .time{padding-bottom:3px;padding-bottom:.6vh}}@keyframes blinker{50%{opacity:0}}#replay{user-select:none;color:#000;text-align:center;display:none}#replay .text{pointer-events:none;position:absolute;top:16px;right:16px;z-index:3}#replay .title{font-size:4vh;animation:blinker 1s linear infinite}#replay .bottom-line{font-size:1.5vh;line-height:1.5vh}#replay .bottom-line .subtitle{display:inline-block}#replay .bottom-line .skip-count{margin-left:8px;float:right}#replay .button.back{position:absolute;left:8px;bottom:8px;z-index:3}#quickchat{pointer-events:none;user-select:none;position:absolute;top:70px;left:0;width:100%;text-align:center;z-index:2;color:#000;font-size:14px;display:none}#quickchat div{display:inline-block;margin:0 4px}#control-in{overflow:hidden;pointer-events:none;user-select:none;position:absolute;top:15%;left:0;width:100%;text-align:center;z-index:2;font-size:32px;font-weight:700;color:#222;display:none;font-family:Cartwheel,'Exo 2 Extra';letter-spacing:2px;text-transform:uppercase}@media screen and (max-width:600px),screen and (max-height:767px){#control-in{font-size:16px;font-size:1.6vh}}#countdown{overflow:hidden;pointer-events:none;user-select:none;position:absolute;top:25%;left:0;width:100%;text-align:center;z-index:2;font-size:64px;font-weight:700;color:#222;display:none;font-family:Cartwheel,'Exo 2 Extra';letter-spacing:4px;text-transform:uppercase}@media screen and (max-width:600px),screen and (max-height:767px){#countdown{font-size:32px;font-size:6.4vh}}#goal{overflow:hidden;pointer-events:none;user-select:none;position:absolute;top:0;left:0;width:100%;height:100%;text-align:center;z-index:2;color:#222;display:none}#goal .top{position:absolute;width:50%;top:30%;left:25%;transform:translate(-50%,0);font-size:96px;font-weight:700;font-family:Cartwheel,'Exo 2 Extra';text-transform:uppercase;letter-spacing:4px}@media screen and (max-width:600px),screen and (max-height:767px){#goal .top{font-size:48px;font-size:9.6vh;top:20%}}#goal .bottom{position:absolute;bottom:20%;width:100%;color:#fff}@media screen and (max-width:600px),screen and (max-height:767px){#goal .bottom{bottom:10%}}#goal .bottom .box{background-color:rgba(0,0,0,.6);margin:0 auto;display:inline-block;padding:16px;border-radius:16px;width:auto;font-family:ActionMan-Bold,'Exo 2';font-weight:700;text-transform:uppercase}#goal .bottom .box .player-name{font-weight:400;text-transform:none}@media screen and (max-width:600px),screen and (max-height:767px){#goal .bottom .box{padding:12px;padding:2.4vh}}#goal .bottom .table{display:table;width:auto}#goal .bottom .row{display:table-row;vertical-align:middle}#goal .bottom .field,#goal .bottom .field2{text-align:left;font-size:32px;font-weight:700;font-family:ActionMan-Bold,'Exo 2';font-weight:700;text-transform:uppercase;vertical-align:middle;display:table-cell;padding-bottom:16px;text-align:right}@media screen and (max-width:600px),screen and (max-height:767px){#goal .bottom .field,#goal .bottom .field2{font-size:16px;font-size:3.2vh;padding-bottom:8px;padding-bottom:1.6vh}}#goal .bottom .field2{font-size:24px}@media screen and (max-width:600px),screen and (max-height:767px){#goal .bottom .field2{font-size:12px;font-size:2.4vh}}#goal .bottom .value{padding-left:32px;font-weight:700;font-size:24px;vertical-align:middle;display:table-cell;text-align:right;padding-bottom:16px}@media screen and (max-width:600px),screen and (max-height:767px){#goal .bottom .value{font-size:12px;font-size:2.4vh;padding-bottom:8px;padding-bottom:1.6vh}}#goal #goalscorer-name{padding-bottom:6px}@media screen and (max-width:600px),screen and (max-height:767px){#goal #goalscorer-name{padding-bottom:3px;padding-bottom:.6vh}}#goal #assist-name{padding-bottom:12px}@media screen and (max-width:600px),screen and (max-height:767px){#goal #assist-name{padding-bottom:6px;padding-bottom:1.2vh}}.player-name{font-family:Arial;font-weight:400;text-transform:none;display:inline-block;overflow:hidden;max-width:200px}#nitro-bar{display:none;pointer-events:none;user-select:none;position:absolute;bottom:16px;left:0;width:100%;height:32px;text-align:center;z-index:3;box-sizing:border-box}@media screen and (max-width:600px),screen and (max-height:767px){#nitro-bar{bottom:4px;height:24px;font-size:14px;bottom:.8vh;height:4.8vh;font-size:2.8vh}}#nitro-bar .box{width:25%;height:100%;left:37.5%;position:absolute;vertical-align:middle}@media screen and (max-width:600px),screen and (max-height:767px){#nitro-bar .box{width:50%;left:25%}}#nitro-bar .box .text{position:absolute;right:16px;height:100%;line-height:32px;text-align:right;vertical-align:middle;color:#a80;font-family:ActionMan-Bold,'Exo 2';font-weight:700;text-transform:uppercase}@media screen and (max-width:600px),screen and (max-height:767px){#nitro-bar .box .text{line-height:24px;line-height:4.8vh}}#nitro-bar .box .borders{border:4px solid #a80;border-radius:8px;width:100%;height:100%;position:absolute;top:-4px;left:-4px}@media screen and (max-width:600px),screen and (max-height:767px){#nitro-bar .box .borders{border:2px solid #a80;border-radius:4px;top:-2px;left:-2px;border:.4vh solid #a80;border-radius:.8vh;top:-.4vh;left:-.4vh}}#nitro-bar .box .bar{background-color:#fd5;border-top-right-radius:8px;border-bottom-right-radius:8px;position:absolute;top:0;left:0;height:100%;width:25%}@media screen and (max-width:600px),screen and (max-height:767px){#nitro-bar .box .bar{border-top-right-radius:4px;border-bottom-right-radius:4px;border-top-right-radius:.8vh;border-bottom-right-radius:.8vh}}#game-over,#sudden-death{overflow:hidden;pointer-events:none;user-select:none;position:absolute;width:100%;height:100%;text-align:center;z-index:2;left:0;top:0;font-size:64px;font-weight:700;font-family:Cartwheel,'Exo 2 Extra';font-weight:700;text-transform:uppercase;letter-spacing:4px;display:none}@media screen and (max-width:600px),screen and (max-height:768px){#game-over,#sudden-death{font-size:32px;font-size:6.4vh}}#game-over .text,#sudden-death .text{position:absolute;width:50%;top:20%;left:25%;transform:translate(-50%,0);display:inline-block}.leaderboard-block{display:none;overflow:hidden;pointer-events:none;user-select:none;position:absolute;text-align:left;bottom:16px;right:16px;font-family:Arial;border-radius:12px;padding:8px 16px;z-index:45;background-color:rgba(0,0,0,.5);color:#fff}.leaderboard-block .title{text-align:center}.leaderboard-block .subtitle{text-align:center;margin-bottom:8px;font-size:12px}.leaderboard-block .lb-item .points{float:right;margin-left:8px}.leaderboard-block .lb-item span{vertical-align:middle}.leaderboard-block .is-self{color:#888}.leaderboard-block .separator{border-bottom:1px solid #8e8e8e;margin:8px 0}.leaderboard-block .footer{text-align:right;font-size:10px;margin-top:4px}#player-action{display:none;pointer-events:none;user-select:none;position:absolute;width:100%;height:50%;text-align:center;z-index:2;left:0;top:25%;font-size:32px;font-weight:700;font-family:Cartwheel,'Exo 2 Extra';font-weight:700;text-transform:uppercase}#player-action #player-action-text{height:20%;animation-duration:2s}@media screen and (max-width:600px),screen and (max-height:767px){#player-action{font-size:16px;font-size:3.2vh}}#level-progress{display:none;position:absolute;top:16px;right:16px;z-index:45;text-align:center;font-family:ActionMan-Bold,'Exo 2';font-weight:700;text-transform:uppercase;font-size:20px;color:#fff;border-radius:16px;padding:16px;padding-top:24px;background-color:rgba(0,0,0,.5);box-shadow:4px 4px 10px 0 rgba(0,0,0,.5)}#level-progress .close{position:absolute;right:12px;top:12px;cursor:pointer;font-size:0}#level-progress .close img{width:12px;height:12px;color:#fff}#level-progress .text{margin-bottom:8px}#level-progress .rank{font-size:16px;color:#d3d3d3}#level-progress .box{border:2px solid #3a3a3a;width:100%;min-width:200px;height:25px;border-radius:8px}#level-progress .box .bar{background-color:#38e24b;background:linear-gradient(to bottom,#38e24b,#2ba739);width:60%;height:100%;border-radius:5px}#achievements{display:none;position:absolute;top:160px;right:16px;z-index:45;border-radius:16px;padding:16px;padding-top:24px;background-color:rgba(0,0,0,.5);box-shadow:4px 4px 10px 0 rgba(0,0,0,.5);text-align:center;font-family:ActionMan-Bold,'Exo 2';font-weight:700;text-transform:uppercase;font-size:20px;color:#fff}#achievements .close{position:absolute;right:12px;top:12px;cursor:pointer;font-size:0}#achievements .close img{width:12px;height:12px;color:#fff}#achievements .title{margin-bottom:16px}#achievements .descr{font-size:16px;color:#d3d3d3;margin-bottom:16px}#achievements img{height:64px}#players-tab{display:none;position:absolute;top:0;left:0;width:100%;height:100%;text-align:center;pointer-events:none;user-select:none;z-index:40;color:#fff}#players-tab .fade-bg{position:absolute;width:100%;height:100%;background-color:#000;opacity:.7}#players-tab .center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80%}#players-tab table{margin-left:auto;margin-right:auto;font-size:20px}#players-tab table th{font-weight:700;padding:16px}#players-tab table td{padding:8px}#players-tab table td img{width:20px;height:20px;cursor:pointer;pointer-events:all}#players-tab table .red{background-color:rgba(211,118,71,.3)}#players-tab table .blue{background-color:rgba(59,79,143,.3)}#my-statistics{display:none;position:absolute;top:0;left:0;width:100%;height:100%;text-align:center;z-index:40;font-family:ActionMan-Bold,'Exo 2';font-weight:700;text-transform:uppercase}#my-statistics .fade-bg{position:absolute;width:100%;height:100%;background-color:#fff;opacity:.9;z-index:-1}#my-statistics .center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80%}#my-statistics .player-avatar{vertical-align:middle;width:48px;margin-right:16px}#my-statistics .player-name{display:inline-block;font-size:36px;font-weight:400;text-transform:none;vertical-align:middle;max-width:none}#my-statistics .level{font-size:28px;margin-bottom:8px}#my-statistics .bar-box{border:2px solid #3a3a3a;position:relative;left:25%;width:50%;height:25px;border-radius:8px}#my-statistics .bar-box .bar{background-color:#38e24b;background:linear-gradient(to bottom,#38e24b,#2ba739);width:60%;height:100%;border-radius:5px}#my-statistics .rank{font-size:20px;color:#006400;margin-bottom:32px}#my-statistics .stats-table{margin-left:auto;margin-right:auto;text-align:left;margin-bottom:32px}#my-statistics .stats-table td:nth-child(2){padding-left:48px}#my-statistics .achievement-title{font-size:28px}#my-statistics .achievement-list{text-align:left;overflow-y:scroll;max-height:200px;text-align:center}#my-statistics .achievement-list .achievement{margin-right:8px;margin-left:8px;display:inline-block;text-align:center;max-width:100px;vertical-align:top}#my-statistics .achievement-list .achievement img{height:96px;vertical-align:middle}#my-statistics .achievement-list .achievement .title{vertical-align:middle;display:block;max-width:100px}#my-statistics .button{font-size:14px;padding:4px 8px}#my-statistics .close{margin-top:32px;cursor:pointer}#leaderboards{display:none;position:absolute;top:0;left:0;width:100%;height:100%;text-align:center;z-index:40;font-family:ActionMan-Bold,'Exo 2';font-weight:700;text-transform:uppercase}#leaderboards .fade-bg{position:absolute;width:100%;height:100%;max-height:100%;overflow-y:scroll;background-color:#fff;opacity:.9;z-index:-1}#leaderboards .center{position:absolute;top:0;left:50%;transform:translate(-50%,0);width:80%}#leaderboards .button.close{position:fixed;right:32px;top:16px}#leaderboards .title{font-size:24px;margin-bottom:16px;margin-top:32px}#leaderboards .button{font-size:14px;padding:4px 8px;margin:4px 4px}#leaderboards .button.unselected{background-color:#d3d3d3}#leaderboards .button.unselected :hover{background-color:#a9a9a9}#leaderboards .buttons{margin-bottom:28px}#leaderboards table{margin-left:auto;margin-right:auto;margin-bottom:32px}#leaderboards table td,#leaderboards table th{padding:0 16px}#leaderboards .footer{font-family:Arial;font-weight:400;text-transform:none;font-size:12px;margin-bottom:32px}#replay-ui{display:none;position:absolute;top:0;left:0;width:100%;height:100%;user-select:none;z-index:40}#replay-ui #back-button{position:absolute;left:8px;top:8px}#replay-ui #event-list{transition:width .2s;position:absolute;top:0;right:0;width:20%;height:100%;box-sizing:border-box;overflow:auto;background-color:#fff;padding:8px 8px;white-space:nowrap}#replay-ui #event-list #minimize-button{font-weight:700;cursor:pointer;margin-bottom:16px}#replay-ui #event-list #event-list-items .item{cursor:pointer}#replay-ui #event-list #event-list-items .item:hover{background-color:#add8e6}#replay-ui #replay-controls{position:absolute;bottom:0;left:0;width:100%;text-align:center;margin-bottom:8px}#game-summary{display:none;position:absolute;top:0;left:0;width:100%;height:100%;text-align:center;z-index:40;font-family:ActionMan-Bold,'Exo 2';font-weight:700;text-transform:uppercase;color:#000}#game-summary .fade-bg{position:absolute;width:100%;height:100%;background-color:#fff;opacity:.7}#game-summary .result{overflow:hidden;color:#000;margin-top:16px;margin-bottom:16px;margin-top:1.6vh;margin-bottom:1.6vh;width:100%;font-size:80px;font-size:8vh;vertical-align:middle}#game-summary .result img{width:64px;width:6.4vh;vertical-align:middle}#game-summary .mvp-block{overflow:hidden;animation-delay:2s;color:#000;vertical-align:middle;margin:0 0;text-align:center;display:table;table-layout:fixed;width:100%}#game-summary .mvp-block .mvp{font-size:24px;font-size:2.4vh;padding-left:32px;display:table-cell;vertical-align:middle}#game-summary .mvp-block .player-name{font-size:48px;font-size:4.8vh;vertical-align:middle;text-transform:none;font-weight:400;max-width:none;white-space:nowrap}#game-summary .mvp-block .player-block{animation-delay:4s;display:inline-block;display:table-cell;padding-left:16px;padding-right:16px;overflow:hidden;overflow-wrap:break-word;vertical-align:middle;word-break:break-all}#game-summary .mvp-block img{vertical-align:middle;width:48px;width:4.8vh;margin:0 8px}#game-summary .mvp-block .points{font-size:32px;font-size:3.2vh;display:table-cell;vertical-align:middle;padding-right:32px}#game-summary .remaining{animation-delay:6s}#game-summary .global-table{display:table;width:100%;margin-top:16px;margin-bottom:16px;margin-top:1.6vh;margin-bottom:1.6vh}#game-summary .global-table .global-row{display:table-row}#game-summary .global-table .global-row .row-blue,#game-summary .global-table .global-row .row-red{color:#fff;display:table-cell;position:relative;width:50%;padding:16px 16px;padding:1.6vh 1.6vh;vertical-align:middle}#game-summary .global-table .global-row .row-blue .team-name,#game-summary .global-table .global-row .row-red .team-name{display:inline-block;font-size:20px;font-size:2vh;padding-left:8px;padding-left:.8vh;float:left}#game-summary .global-table .global-row .row-blue .score,#game-summary .global-table .global-row .row-red .score{display:inline-block;text-align:right;font-size:20px;font-size:2vh;padding-right:8px;padding-right:.8vh;float:right;padding-bottom:8px;padding-bottom:.8vh}#game-summary .global-table .global-row .blue-box{background-color:#3b4f8f;border:4px solid #132561;border:.4vh solid #132561;border-radius:12px;border-radius:1.2vh;padding:16px 16px;padding:1.6vh 1.6vh;padding-top:20px;padding-top:2vh;box-shadow:4px 4px 10px 0 rgba(0,0,0,.5);box-shadow:.4vh .4vh 1vh 0 rgba(0,0,0,.5)}#game-summary .global-table .global-row .red-box{background-color:#d37647;border:4px solid #8f390d;border:.4vh solid #8f390d;border-radius:12px;border-radius:1.2vh;padding:16px 16px;padding:1.6vh 1.6vh;padding-top:20px;padding-top:2vh;box-shadow:4px 4px 10px 0 rgba(0,0,0,.5);box-shadow:.4vh .4vh 1vh 0 rgba(0,0,0,.5)}#game-summary .global-table .global-row .score-table{display:table;margin:auto auto;width:100%;font-size:14px;font-size:1.4vh;border-collapse:collapse}#game-summary .global-table .global-row .score-table .header-row,#game-summary .global-table .global-row .score-table .row{display:table-row}#game-summary .global-table .global-row .score-table .header-row .header,#game-summary .global-table .global-row .score-table .header-row .row-cell,#game-summary .global-table .global-row .score-table .row .header,#game-summary .global-table .global-row .score-table .row .row-cell{display:table-cell;padding:2px}#game-summary .global-table .global-row .score-table .header-row{font-size:14px;font-size:1.4vh;font-weight:700}#game-summary .global-table .global-row .score-table .row-cell{border:1px solid #ccc;width:20%;vertical-align:middle}#game-summary .global-table .global-row .score-table .row div:first-child{border:none;width:36px;width:3.6vh;visibility:hidden}#game-summary .global-table .global-row .score-table .row img{width:28px;width:2.8vh;vertical-align:middle}#game-summary .global-table .global-row .score-table .row.left{color:#888}#game-summary .global-table .global-row .score-table .player-name{text-transform:none;font-weight:400}#game-summary .bottom .left-block,#game-summary .bottom .right-block{display:inline-block;width:310px;height:260px;position:relative}#game-summary .bottom .left-block .center,#game-summary .bottom .right-block .center{position:absolute;top:50%;transform:translateY(-50%);text-align:center;width:100%}@media screen and (max-height:480px){#game-summary .bottom .left-block .center,#game-summary .bottom .right-block .center{top:0;transform:translateY(0)}}#game-summary .bottom .change-team{font-size:14px;font-size:1.4vh;font-family:Arial;font-weight:400;text-transform:none}#game-summary .bottom .promo-banner{width:300px;height:250px;text-align:center;margin:0 auto;margin-top:32px;margin-top:3.2vh;position:relative}#game-summary .bottom .promo-banner .adblocked{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:Arial;font-weight:400;text-transform:none;font-size:32px;font-size:3.2vh;width:100%}#game-summary .bottom .promo-banner2{width:728px;height:90px;background-color:#f0f8ff;text-align:center;margin:0 auto;margin-top:32px}#game-summary .bottom .button.change-team,#game-summary .bottom .button.download,#game-summary .bottom .button.ready{font-size:16px;min-width:30vh;min-width:200px;margin-bottom:.8vh}#game-summary .bottom .game-countdown{margin-bottom:16px;margin-bottom:1.6vh;font-family:Arial;font-weight:400;text-transform:none;margin-top:8px;margin-top:.8vh}#game-summary .button.back{position:absolute;left:16px;bottom:16px;left:1.6vh;bottom:1.6vh;font-size:2vh;padding:.8vh 1.6vh}.button{cursor:pointer;display:inline-block;outline:0;text-align:center;padding:8px 16px;border-radius:4px;box-shadow:none;border:none;background-color:#2185d0;color:#fff;font-size:20px;text-decoration:none}.button:hover{background-color:#1678c2}.button.back,.button.grey{background-color:#95a5a6}.button.back:hover,.button.grey:hover{background-color:#798d8f}#connection-lost,#kicked-inactivity{position:absolute;width:100%;height:100%;text-align:center;user-select:none;z-index:200;left:0;top:0;background-color:rgba(0,0,0,.5);font-size:32px;font-weight:700;display:none}#connection-lost .popup,#kicked-inactivity .popup{display:inline-block;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#fff;border:8px solid #d37647;border-radius:32px;padding:32px}#connection-lost .popup .content,#kicked-inactivity .popup .content{width:100%}#connection-lost .button,#kicked-inactivity .button{margin:0 auto;display:block;margin-top:64px}#homepage{position:absolute;width:100%;height:100%;left:0;top:0;text-align:center;overflow:auto}#homepage .background{width:100%;height:100%;background-image:url(img/background.png);background-size:cover;background-position:center center}#homepage .fade{width:100%;height:100%;background-color:rgba(0,0,0,.5);display:table;table-layout:fixed}#homepage .row{display:table-row}#homepage .logo{position:absolute;user-select:none;top:10%;width:90%;left:5%}#homepage .logo .anim{display:inline-block}#homepage .logo .anim img{width:100%;max-width:600px}#homepage #youtube-live{z-index:1;position:absolute;right:0;bottom:0}#homepage #youtube-live .title{color:#fff;font-size:2vh;font-weight:700}#homepage #youtube-live iframe{border:1px solid #fff}#homepage .content{height:100%;position:absolute;width:100%;pointer-events:none}#homepage .content>div{width:33%;display:inline-block;height:90%;position:relative}@media screen and (max-height:360px),screen and (max-width:600px){#homepage .content>div{height:100%}}#homepage .content>div .inside{margin:auto auto;position:absolute;top:60%;left:50%;transform:translate(-50%,-50%)}#homepage .content .left-box{min-width:300px;left:0}#homepage .content .left-box .inside{max-width:300px;pointer-events:all}#homepage .content .left-box .left-pub{width:300px;height:250px;text-align:center}#homepage .content .left-box .left-pub .adblocked{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:Arial;font-size:32px;width:100%}#homepage .content .left-box .left-pub .pf-cta{margin-top:24px;font-size:1.5vh;cursor:pointer;display:inline-block;outline:0;text-align:center;padding:8px 16px;padding:.5vh 1h;border-radius:.5vh;box-shadow:none;border:none;background-color:#2185d0;color:#fff;text-decoration:none}#homepage .content .left-box .left-pub .pf-cta:hover{background-color:#1678c2}#homepage .content .middle-box .inside{max-width:400px;width:90%;pointer-events:all}@media screen and (max-height:400px){#homepage .content .middle-box .inside{bottom:8px;transform:translate(-50%,0);top:auto}}#homepage .content .middle-box #homepage-loading{font-size:32px}#homepage .content .middle-box #homepage-loaded{display:none}#homepage .content .middle-box input,#homepage .content .middle-box select{text-align:left;padding:8px 16px;border-radius:8px;box-shadow:none;border:none;font-size:20px;outline:0;border-radius:4px}#homepage .content .middle-box #username{width:100%;display:block;height:64px;font-size:32px;border-radius:16px;box-sizing:border-box;max-width:250px;height:48px;font-size:20px;border-radius:4px;margin-left:auto;margin-right:auto;margin-bottom:16px}@media screen and (max-height:400px){#homepage .content .middle-box #username{font-size:20px;height:40px;margin-bottom:8px}}#homepage .content .middle-box .button{display:block;width:100%;height:64px;font-size:32px;border-radius:16px;margin-top:32px;max-width:250px;height:48px;font-size:20px;border-radius:4px;box-shadow:0 2px 10px rgba(0,0,0,.2),0 4px 0 #1678c2;margin-left:auto;margin-right:auto;margin-top:16px}@media screen and (max-height:400px){#homepage .content .middle-box .button{font-size:20px;height:40px}}#homepage .content .middle-box .secondary-buttons .button,#homepage .content .middle-box .skin-buttons .button{display:inline-block;box-sizing:border-box;width:50%;max-width:120px;font-size:14px;height:24px;padding-top:4px;padding-bottom:4px;box-shadow:0 2px 10px rgba(0,0,0,.2),0 4px 0 #95a5a6}#homepage .content .middle-box .secondary-buttons .button:hover,#homepage .content .middle-box .skin-buttons .button:hover{box-shadow:0 2px 10px rgba(0,0,0,.2),0 4px 0 #798d8f}#homepage .content .middle-box .secondary-buttons #blue-skin-input,#homepage .content .middle-box .secondary-buttons #red-skin-input,#homepage .content .middle-box .secondary-buttons #replay-file-input,#homepage .content .middle-box .skin-buttons #blue-skin-input,#homepage .content .middle-box .skin-buttons #red-skin-input,#homepage .content .middle-box .skin-buttons #replay-file-input{display:none}#homepage .content .middle-box #skin-editor{display:block;display:none;text-align:center;height:100%;width:100%;-webkit-user-select:none;user-select:none}#homepage .content .middle-box #skin-editor .skin-buttons .button{font-size:12px}#homepage .content .middle-box #skin-editor input[type=file]{display:none}#homepage .content .middle-box #skin-editor .game-sprites{margin:16px auto}#homepage .content .middle-box #skin-editor .game-sprites>div{margin:8px auto}#homepage .content .middle-box #skin-editor .game-sprites select{font-size:12px;padding:4px 4px}#homepage .content .middle-box #skin-editor .game-sprites .button{display:inline-block;box-sizing:border-box;font-size:12px;padding:4px 4px;height:auto;width:auto;margin:auto auto;margin-left:16px}#homepage .content .middle-box .gamemode,#homepage .content .middle-box .server{text-align:center;vertical-align:middle;width:100%;font-size:16px;margin-top:32px;margin-top:16px}#homepage .content .middle-box .gamemode .label,#homepage .content .middle-box .server .label{display:inline-block;vertical-align:middle;padding-right:16px;width:auto;font-weight:700;text-align:right;color:#a9a9a9}#homepage .content .middle-box .gamemode .field,#homepage .content .middle-box .server .field{vertical-align:middle;display:inline-block;overflow:hidden}#homepage .content .middle-box .gamemode .field select,#homepage .content .middle-box .server .field select{font-size:16px}#homepage .content .middle-box .gamemode .field .ui-selectmenu-button,#homepage .content .middle-box .server .field .ui-selectmenu-button{width:auto;padding:4px 8px}#homepage .content .middle-box .gamemode .field .ui-selectmenu-button .ui-selectmenu-text,#homepage .content .middle-box .server .field .ui-selectmenu-button .ui-selectmenu-text{margin-right:30px}#homepage .content .middle-box .gamemode .server,#homepage .content .middle-box .server .server{display:none}#homepage .content .middle-box .gameModes{margin-top:16px;line-height:52px}@media screen and (max-height:400px){#homepage .content .middle-box .gameModes{margin-top:8px}}#homepage .content .middle-box .gameModes div{display:inline-block;height:48px;line-height:48px;background-color:#fff;border-radius:4px;padding:0 6px;margin:0 1px;font-size:16px;font-weight:700;background-color:#2185d0;box-shadow:0 2px 10px rgba(0,0,0,.2),0 4px 0 #1678c2;color:#fff;cursor:pointer;background-color:#95a5a6;box-shadow:0 2px 10px rgba(0,0,0,.2),0 4px 0 #95a5a6}@media screen and (max-height:400px){#homepage .content .middle-box .gameModes div{font-size:12px;height:40px;line-height:40px}}#homepage .content .middle-box .gameModes div:hover{background-color:#798d8f;box-shadow:0 2px 10px rgba(0,0,0,.2),0 4px 0 #798d8f}#homepage .content .middle-box .gameModes div.selected{background-color:#d37647;box-shadow:0 2px 10px rgba(0,0,0,.2),0 4px 0 #ab5528}#homepage .content .middle-box #play-button{margin-top:8px}#homepage .content .middle-box .feedback{color:#a9a9a9;font-size:14px;margin-top:16px}#homepage .content .middle-box .no-translation,#homepage .content .middle-box .update-translation{display:none;margin-top:48px;color:#a9a9a9;font-size:12px}#homepage .content .middle-box .no-translation a,#homepage .content .middle-box .update-translation a{text-decoration:none;color:#fff}#homepage .content .middle-box .no-translation a:hover,#homepage .content .middle-box .update-translation a:hover{color:#6495ed}#homepage .content .right-box .inside{width:90%;max-width:300px;border:1px solid #000;background-color:#fff;padding:16px;border-radius:16px;pointer-events:all}@media screen and (max-height:700px){#homepage .content .right-box .inside{padding:8px}}#homepage .content .right-box .title{font-weight:700;font-size:16px}@media screen and (max-height:630px){#homepage .content .right-box .title{font-size:14px}}#homepage .content .right-box ul{padding-left:16px;text-align:left;color:#666;font-size:14px;margin-bottom:0}@media screen and (max-height:700px){#homepage .content .right-box ul{margin-top:8px}}#homepage .content .right-box ul li{line-height:20px;margin-bottom:8px}@media screen and (max-height:700px){#homepage .content .right-box ul li{font-size:11px;line-height:normal}}#homepage .content .right-box .more{text-align:right;font-size:12px;margin-bottom:8px}#homepage .content .right-box .poll{text-align:left}#homepage .content .right-box .poll img{width:32px}#homepage .content .right-box .cp{margin-top:32px}@media screen and (max-height:700px){#homepage .content .right-box .cp{margin-top:16px}}#homepage .content .right-box .cp iframe{border:none;border-radius:16px}#homepage .content .right-box .cp img{border-radius:16px}#homepage .content .right-box .watch-tourney .button{font-size:16px;padding:4px 8px}#homepage .connecting{display:table-row;text-align:center;height:100%;display:none}#homepage .connecting .box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#fff;border:8px solid #3b4f8f;border-radius:32px;padding:32px;box-sizing:border-box;min-width:700px}@media screen and (max-width:700px){#homepage .connecting .box{width:100%;min-width:auto}}@media screen and (max-width:600px),screen and (max-height:767px){#homepage .connecting .box{padding:8px}}#homepage .connecting .box table{width:900px}#homepage .connecting .box .title{font-size:32px;text-align:center;column-span:all;padding:0 32px;font-family:Cartwheel,'Exo 2 Extra';letter-spacing:2px;font-weight:700;text-transform:uppercase}@media screen and (max-width:600px),screen and (max-height:767px){#homepage .connecting .box .title{font-size:20px}}#homepage .connecting .box .tuto-image{width:50%}#homepage .connecting .box .tuto-image img{width:450px}#homepage .connecting .box .tuto-text{width:100%;text-align:left;font-size:20px;line-height:30px;padding:32px;box-sizing:border-box}#homepage .connecting .box .tuto-text #control-gamepad{display:none}@media screen and (max-height:768px){#homepage .connecting .box .tuto-text{font-size:16px;line-height:18px;padding:8px;font-size:2vh;line-height:3vh;padding:3.2vh}}@media screen and (max-width:600px),screen and (max-height:767px){#homepage .connecting .box .tuto-text{font-size:12px;line-height:13px}}#homepage .connecting .box .tuto-button{text-align:center;column-span:all}@media screen and (max-width:600px),screen and (max-height:767px){#homepage .connecting .box .tuto-button .button{font-size:16px}}#homepage .connecting .box #connecting-message-row{display:none}#homepage .connecting .box #connecting-message-row .message{font-size:24px;text-align:center}#homepage .connecting .box #connecting-message-row .message #connecting-message{vertical-align:middle}#homepage .connecting .box #connecting-message-row .message .spinner{vertical-align:middle;padding:8px;width:32px;animation-name:rotate;-webkit-animation-name:rotate;animation-duration:5s;-webkit-animation-duration:5s;animation-iteration-count:infinite;-webkit-animation-iteration-count:infinite;animation-timing-function:linear;-webkit-animation-timing-function:linear}#homepage .connecting .asset-load{font-family:ActionMan-Bold,'Exo 2';font-weight:700;text-transform:uppercase;position:absolute;left:-100px}#homepage .bottom-bar{position:absolute;left:0;bottom:16px;width:100%;vertical-align:middle;line-height:0;display:table}@media screen and (max-height:400px),screen and (max-width:600px){#homepage .bottom-bar{display:none}}#homepage .bottom-bar .text{line-height:normal;margin-bottom:8px;color:#a9a9a9;font-size:16px}#homepage .bottom-bar .contact-bar,#homepage .bottom-bar .share-bar,#homepage .bottom-bar .social-bar{padding-left:16px;padding-right:16px;display:table-cell;vertical-align:bottom}#homepage .bottom-bar .social-bar{text-align:left}#homepage .bottom-bar .social-bar a{display:inline-block;height:48px}#homepage .bottom-bar .social-bar a img,#homepage .bottom-bar .social-bar a svg{width:48px}#homepage .bottom-bar .contact-bar{line-height:normal;color:#a9a9a9}#homepage .bottom-bar .contact-bar a{color:#a9a9a9;font-size:16px;text-decoration:none}@media screen and (max-height:768px){#homepage .bottom-bar .contact-bar a{font-size:16px;font-size:1.6vh}}#homepage .bottom-bar .contact-bar a:hover{color:#fff}#homepage .bottom-bar .io-games-bar{display:table-cell;line-height:normal;padding-left:16px;padding-right:16px;text-align:right;vertical-align:bottom}#homepage .create-team-bar{position:absolute;left:16px;top:16px;vertical-align:middle}@media screen and (max-width:600px){#homepage .create-team-bar{display:none}}#homepage .create-team-bar .button{font-size:18px;background-color:#d37647;box-shadow:0 2px 10px rgba(0,0,0,.2),0 4px 0 #ab5528}@media screen and (max-height:400px){#homepage .create-team-bar .button{font-size:12px}}#homepage .create-team-bar .button:hover{background-color:#8f390d;box-shadow:0 2px 10px rgba(0,0,0,.2),0 4px 0 #79320e}#homepage .create-team-bar .text{line-height:normal;margin-top:10px;color:#a9a9a9;font-size:16px}@media screen and (max-height:400px){#homepage .create-team-bar .text{display:none}}#homepage .team-bar{display:none;text-align:left;position:absolute;left:16px;top:16px;vertical-align:middle;background-color:rgba(0,0,0,.5);padding:8px 16px;border-radius:8px;z-index:1}#homepage .team-bar .button{font-size:14px;background-color:#d37647;padding:4px 8px}#homepage .team-bar .button:hover{background-color:#8f390d}#homepage .team-bar .button.leave,#homepage .team-bar .button.switch{display:inline-block}#homepage .team-bar .button.leave{background-color:#d3d3d3;margin-top:24px}#homepage .team-bar .button.leave:hover{background-color:#a9a9a9}#homepage .team-bar .text{line-height:normal;color:#fff;font-size:18px;margin-bottom:4px}#homepage .team-bar input{font-size:14px;color:#a9a9a9;border-radius:8px;border:none;padding:4px 8px;outline:0}#homepage .team-bar .teammates-title{color:#fff;margin-top:8px;margin-bottom:8px}#homepage .team-bar .teammates-list{color:#fff;margin-left:16px;vertical-align:middle}#homepage .team-bar .teammates-list img{width:16px;vertical-align:middle}#homepage .team-bar #team-chat-block{color:#fff;margin-top:8px;padding-top:8px;font-weight:400;font-size:1.5vh;border-top:1px solid grey}#homepage .team-bar #team-chat-block #team-chat-history{margin-top:8px}#homepage .team-bar #team-chat-block #team-chat-input{color:#000}#homepage .team-bar .private-block{margin-top:1vh;color:#fff}#homepage .team-bar .private-block input{transform:scale(1.5);margin-right:.5vw}#homepage .settings{position:absolute;right:16px;top:16px;vertical-align:middle}@media screen and (max-width:600px),screen and (max-height:400px){#homepage .settings{right:8px;top:8px}}#homepage .settings .button{font-size:16px;box-shadow:0 2px 10px rgba(0,0,0,.2),0 4px 0 #1678c2}@media screen and (max-width:600px),screen and (max-height:400px){#homepage .settings .button{font-size:12px}}#homepage .settings .text{line-height:normal;margin-top:10px;color:#a9a9a9;font-size:16px}@media screen and (max-width:600px),screen and (max-height:400px){#homepage .settings .text{display:none}}#homepage .settings #unconnected-block{margin-left:32px;display:inline-block}@media screen and (max-width:600px),screen and (max-height:400px){#homepage .settings #unconnected-block{margin-left:0}}#homepage .settings #connected-block{margin-left:32px;display:none}#homepage .settings #connected-block img{width:32px;height:32px;vertical-align:middle}#homepage .settings #connected-block img svg{fill:#fff}#homepage .settings-popup{display:none;position:absolute;right:16px;top:16px;padding:32px;padding-bottom:8px;background-color:rgba(0,0,0,.8);border-radius:8px;color:#fff}#homepage .settings-popup .button{font-size:14px;padding:4px 8px}#homepage .settings-popup .button.unselected{opacity:.5}#homepage .settings-popup .joystick{margin-top:16px}#homepage .settings-popup .gamepad{margin-top:16px}#homepage .settings-popup .gamepad input{vertical-align:middle}#homepage .settings-popup .gamepad #gamepad-detected,#homepage .settings-popup .gamepad #gamepad-not-detected{font-size:12px;margin-top:4px}#homepage .settings-popup .antialias{margin-top:16px}#homepage .settings-popup .fullscreen{margin-top:16px}#homepage .settings-popup .close{margin-top:24px;cursor:pointer}#homepage .login-popup{display:none;position:absolute;right:16px;top:16px;padding:32px;padding-bottom:8px;background-color:rgba(0,0,0,.8);border-radius:8px;color:#fff}#homepage .login-popup .title{margin-bottom:8px;font-weight:700}#homepage .login-popup .button{font-size:14px;padding:4px 8px}#homepage .login-popup .close{margin-top:24px;cursor:pointer}#homepage .login-popup td{padding:8px}#homepage .login-popup .error{color:red}#toasts{pointer-events:none;position:absolute;bottom:1%;left:1%;z-index:200;font-size:16px;color:#fff}#toasts div{padding:8px 8px;margin-top:4px;background-color:#6495ed;border-radius:4px}#toasts div.error{background-color:#dc143c}#camera-text{pointer-events:none;user-select:none;position:absolute;bottom:3%;left:1%;z-index:10;font-size:24px;font-weight:700;color:#000;display:none}#chat-block{pointer-events:none;user-select:none;position:absolute;top:1%;left:1%;z-index:45;font-size:14px;color:#000;display:none}@media screen and (max-width:600px),screen and (max-height:767px){#chat-block{font-size:10px;font-size:2vh}}#chat-block .admin,#chat-block .system{color:red}#chat-block .info{font-style:italic;color:#000}#chat-block .name{font-weight:700;display:inline-block;overflow:hidden;max-width:100px;white-space:nowrap}#chat-block .red{color:#8f390d}#chat-block .blue{color:#132561}#chat-block input{border:none;background-color:transparent;outline:0;font-size:14px;cursor:default;width:100%}#chat-block #chat-history div span{vertical-align:middle}.ui-menu-item .ping{font-size:12px;margin-left:8px}.ui-menu-item .description{display:block;font-size:12px;margin-left:8px;color:gray}.ui-menu-item .ui-state-active .description{color:#d3d3d3}canvas{cursor:crosshair}#doorbell-button{display:none}@media screen and (max-width:910px){#homepage .content .left-box,#homepage .content .right-box{display:none}#homepage .content .middle-box{width:99%}}@media screen and (max-height:550px){#homepage .content .left-box,#homepage .content .right-box{display:none}#homepage .content .middle-box{width:99%}}</style>
+<script>
+	window.aiptag = window.aiptag || {cmd: []};
+	aiptag.cmd.display = aiptag.cmd.display || [];
+	aiptag.cmd.player = aiptag.cmd.player || [];
+
+	//CMP tool settings
+	aiptag.cmp = {
+		show: true,
+		position: "centered",  //centered, bottom
+		button: false,
+		buttonText: "Privacy settings",
+		buttonPosition: "bottom-left" //bottom-left, bottom-right, top-left, top-right
+	}
+
+	aiptag.cmd.player.push(function() {
+		aiptag.adplayer = new aipPlayer({
+			AD_WIDTH: 960,
+			AD_HEIGHT: 540,
+			AD_DISPLAY: (window.innerWidth < 960 || window.innerHeight < 540) ? 'center' : 'fullscreen', //default, fullscreen, center, fill
+			LOADING_TEXT: 'loading advertisement',
+			PREROLL_ELEM: function(){return document.getElementById('preroll')},
+			AIP_COMPLETE: function (evt)  {
+                nitroclash.aipComplete();
+			},
+			AIP_REMOVE: function()  {}
+		});
+	});
+
+</script>
+<script async="" src="//api.adinplay.com/libs/aiptag/pub/NTC/nitroclash.io/tag.min.js"></script>
+</head>
+
+<body>
+    <!-- FACEBOOK SDK -->
+    <div id="fb-root"></div>
+    <script>
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId: '225340674655459',
+                autoLogAppEvents: true,
+                xfbml: true,
+                version: 'v6.0'
+            });
+            FB.AppEvents.logPageView();
+            onFacebookLogin();
+        };
+
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {
+                return;
+            }
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+    </script>
+
+    <div id="fadeScreen"></div>
+    <div id="replay-ui">
+        <div id="back-button"><button type="button" class="button back" onclick="nitroclash.backToHomepage();" lang="en">Back to homepage</button></div>
+        <div id="replay-controls">
+            <div class="button" onclick="nitroclash.replayControl(3);">&lt;&lt;</div>
+            <div class="button" onclick="nitroclash.replayControl(0);">Play/Pause</div>
+            <div class="button" onclick="nitroclash.replayControl(4);">&gt;&gt;</div>
+            <div class="button" onclick="nitroclash.replayControl(1);">2x Speed</div>
+            <div class="button" onclick="nitroclash.replayControl(2);">Focus Next</div>
+        </div>
+        <div id="event-list">
+            <div id="minimize-button" onclick="javascript:var el=document.getElementById('event-list'); el.style.width = ((el.style.width=='' || el.style.width=='20%') ? '30px' : '20%');">Hide/show &gt;&gt;</div>
+            <div id="event-list-items"></div>
+        </div>
+
+    </div>
+    <div id="replay">
+        <div class="text">
+            <div class="title">Replay</div>
+            <div class="bottom-line">
+                <div id="skip-replay-text" class="subtitle">Click to skip</div>
+                <div id="skip-replay-count" class="skip-count">0/6</div>
+            </div>
+        </div>
+        <button type="button" class="button back" onclick="nitroclash.backToHomepage();" lang="en">Back to homepage</button>
+    </div>
+    <div id="inGameScore">
+        <span class="blue" id="scoreB">10</span><span class="time" id="gameTime">4:21</span><span class="red" id="scoreR">2</span>
+    </div>
+    <div id="quickchat">
+        <div>[1] Nice shot!</div>
+        <div>[2] Great pass!</div>
+        <div>[3] Thanks</div>
+        <div>[4] Wow!</div>
+        <div>[5] What a play!</div>
+        <div>[6] What a save!</div>
+        <div>[7] That was close...</div>
+        <div>[8] Sorry!</div>
+        <div>[9] No problem.</div>
+        <div>[0] $#&amp;@%!</div>
+    </div>
+    <div id="control-in" class="animated fadeIn" lang="en">You have control in...</div>
+    <div id="countdown" class="animated fadeInDown">5</div>
+    <div id="goal">
+        <div class="top animated tada2" lang="en">Goaaaaal !</div>
+
+        <div class="bottom">
+            <div class="box animated fadeInUp">
+                <div class="table">
+                    <div class="row">
+                        <div class="field" lang="en">Goalscorer:
+                        </div>
+                        <div class="value player-name" id="goalscorer-name">Player</div>
+                    </div>
+                    <div class="row">
+                        <div class="field2" lang="en">Shot speed:
+                        </div>
+                        <div class="value" id="shot-speed">10 km/h</div>
+                    </div>
+                    <div class="row">
+                        <div class="field2" lang="en">Assist:
+                        </div>
+                        <div class="value player-name" id="assist-name">Player</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="nitro-bar">
+        <div class="box">
+            <div id="nitro-bar-value" class="bar"></div>
+            <div class="borders"></div>
+            <div class="text" lang="en">Nitro</div>
+        </div>
+    </div>
+    <div id="game-over">
+        <div id="game-over-text" class="text animated bounceIn" lang="en">Game Over !</div>
+    </div>
+    <div id="sudden-death">
+        <div id="sudden-death-text" class="text animated bounceIn" lang="en">Sudden death !</div>
+    </div>
+    <div id="player-action">
+        <div id="player-action-text" class="animated fadeOutUp">GOAL +50</div>
+    </div>
+
+    <div id="camera-text">Camera mode : Fullscreen</div>
+    <div id="chat-block">
+        <div id="chat-history">I scored!!!
+            <br> Nice goal :)
+        </div>
+        <div>
+            <input id="chat-input" type="text" maxlength="64" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
+    </div>
+    <div id="game-summary" class="animated">
+        <div class="fade-bg"></div>
+        <!--
+        <div id="result-winner" class="result">
+            <div class="animated bounceInDown"><img src="img/winner.png"><span lang="en">WINNER</span></div>
+        </div>
+        <div id="result-loser" class="result">
+            <div class="animated bounceInDown"><img src="img/loser.png"><span lang="en">LOSER</span></div>
+        </div>
+-->
+        <div id="result-blue" class="result">
+            <div class="animated bounceInDown"><img src="img/winner.png"><span lang="en">BLUE WINS</span></div>
+        </div>
+        <div id="result-red" class="result">
+            <div class="animated bounceInDown"><img src="img/winner.png"><span lang="en">RED WINS</span></div>
+        </div>
+        <div class="mvp-block animated bounceInDown"><span class="mvp" lang="en">Most Valuable Player</span><span class="player-block animated bounceIn"><img id="mvp-image" src="img/player-B.png"><span id="mvp-name" class="player-name">SoccerAddict</span></span><span class="points"><span id="mvp-points">570</span> <span> </span><span lang="en">points</span></span>
+        </div>
+        <div class="remaining animated fadeIn">
+            <div class="global-table">
+                <div class="global-row">
+                    <div class="row-blue">
+                        <div class="blue-box">
+                            <div class="team-name" lang="en">BLUE TEAM</div>
+                            <div class="score" lang="en">SCORE: <span id="score-blue">5</span></div>
+
+                            <div id="score-table-B" class="score-table">
+                                <div class="header-row">
+                                    <div class="header"></div>
+                                    <div class="header"></div>
+                                    <div class="header" lang="en">Goals</div>
+                                    <div class="header" lang="en">Assists</div>
+                                    <div class="header" lang="en">Saves</div>
+                                    <div class="header" lang="en"><b>Points</b></div>
+                                </div>
+                                <div id="playerB1" class="row">
+                                    <div id="playerB1-ready" class="row-cell"><img src="img/Action-ok-icon.png" class="animated fadeIn"></div>
+                                    <div id="playerB1-name" class="row-cell player-name">Bump</div>
+                                    <div id="playerB1-goals" class="row-cell">2</div>
+                                    <div id="playerB1-assists" class="row-cell">1</div>
+                                    <div id="playerB1-saves" class="row-cell">1</div>
+                                    <div id="playerB1-points" class="row-cell">560</div>
+                                </div>
+                                <div id="playerB2" class="row">
+                                    <div id="playerB2-ready" class="row-cell"><img src="img/Action-ok-icon.png" class="animated fadeIn"></div>
+                                    <div id="playerB2-name" class="row-cell player-name">Rocket</div>
+                                    <div id="playerB2-goals" class="row-cell">2</div>
+                                    <div id="playerB2-assists" class="row-cell">1</div>
+                                    <div id="playerB2-saves" class="row-cell">1</div>
+                                    <div id="playerB2-points" class="row-cell">560</div>
+                                </div>
+                                <div id="playerB3" class="row">
+                                    <div id="playerB3-ready" class="row-cell"><img src="img/Action-ok-icon.png" class="animated fadeIn"></div>
+                                    <div id="playerB3-name" class="row-cell player-name">League</div>
+                                    <div id="playerB3-goals" class="row-cell">2</div>
+                                    <div id="playerB3-assists" class="row-cell">1</div>
+                                    <div id="playerB3-saves" class="row-cell">1</div>
+                                    <div id="playerB3-points" class="row-cell">560</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row-red">
+                        <div class="red-box">
+                            <div class="team-name" lang="en">RED TEAM</div>
+                            <div class="score" lang="en">SCORE: <span id="score-red">5</span></div>
+
+                            <div id="score-table-R" class="score-table">
+                                <div class="header-row">
+                                    <div class="header"></div>
+                                    <div class="header"></div>
+                                    <div class="header" lang="en">Goals</div>
+                                    <div class="header" lang="en">Assists</div>
+                                    <div class="header" lang="en">Saves</div>
+                                    <div class="header" lang="en">Points</div>
+                                </div>
+                                <div id="playerR1" class="row">
+                                    <div id="playerR1-ready" class="row-cell"><img src="img/Action-ok-icon.png" class="animated fadeIn"></div>
+                                    <div id="playerR1-name" class="row-cell player-name">Bumper car</div>
+                                    <div id="playerR1-goals" class="row-cell">2</div>
+                                    <div id="playerR1-assists" class="row-cell">1</div>
+                                    <div id="playerR1-saves" class="row-cell">1</div>
+                                    <div id="playerR1-points" class="row-cell">560</div>
+                                </div>
+                                <div id="playerR2" class="row">
+                                    <div id="playerR2-ready" class="row-cell"><img src="img/Action-ok-icon.png" class="animated fadeIn"></div>
+                                    <div id="playerR2-name" class="row-cell player-name">Smash sport</div>
+                                    <div id="playerR2-goals" class="row-cell">2</div>
+                                    <div id="playerR2-assists" class="row-cell">1</div>
+                                    <div id="playerR2-saves" class="row-cell">1</div>
+                                    <div id="playerR2-points" class="row-cell">560</div>
+                                </div>
+                                <div id="playerR3" class="row">
+                                    <div id="playerR3-ready" class="row-cell"><img src="img/Action-ok-icon.png" class="animated fadeIn"></div>
+                                    <div id="playerR3-name" class="row-cell player-name">Turbo hockey</div>
+                                    <div id="playerR3-goals" class="row-cell">2</div>
+                                    <div id="playerR3-assists" class="row-cell">1</div>
+                                    <div id="playerR3-saves" class="row-cell">1</div>
+                                    <div id="playerR3-points" class="row-cell">560</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bottom">
+                <div class="left-block">
+                    <div class="center">
+                        <div>
+                            <button id="button-ready" type="button" class="button ready" onclick="nitroclash.readyForNextGame()" lang="en">Click here when ready</button>
+                        </div>
+                        <div>
+                            <button id="button-change-team" type="button" class="button grey change-team" onclick="nitroclash.changeTeam()" lang="en">Change team</button>
+                        </div>
+                        <div>
+                            <button id="button-download-replay" type="button" class="button grey download" onclick="nitroclash.downloadReplay()" lang="en">Download replay</button>
+                        </div>
+                        <div class="game-countdown"><span id="game-summary-countdown">30</span><span lang="en">s remaining...</span></div>
+                    </div>
+                </div>
+                <div class="right-block">
+                    <div class="center">
+                        <div id="banner-on-game-summary" class="promo-banner"></div>
+                    </div>
+                </div>
+                <!--<div class="promo-banner2">AD</div>-->
+            </div>
+            <button type="button" class="button back" onclick="nitroclash.backToHomepage();" lang="en">Back to homepage</button>
+        </div>
+    </div>
+    <div id="leaderboard-block" class="leaderboard-block">
+        <div class="title" lang="en">Leaderboard (points)</div>
+        <div class="subtitle"><span id="lb-server-name">Europe</span> - <span id="lb-player-count">45</span> <span lang="en">players</span></div>
+        <div id="lb-top">
+            <div class="lb-item">1. <span class="player-name">IceHockey</span><span class="points">89123</span></div>
+            <div class="lb-item">2. <span class="player-name">SoccerFan</span><span class="points">54362</span></div>
+            <div class="lb-item is-self">3. <span class="player-name">Nitroclashio</span><span class="points">10009</span></div>
+            <div class="lb-item">4. <span class="player-name">Ronaldo</span><span class="points">3232</span></div>
+            <div class="lb-item">5. <span class="player-name">BigNoob</span><span class="points">5</span></div>
+        </div>
+        <div id="lb-player-line">
+            <div class="separator"></div>
+            <div class="lb-item"><span id="lb-player-rank">12</span>. <span id="lb-player-name" class="player-name">TheBest</span><span class="points" id="lb-player-points">12345</span></div>
+        </div>
+        <div class="footer" lang="en">Press L to show/hide</div>
+    </div>
+    <div id="connection-lost">
+        <div class="popup">
+            <div class="content" lang="en">
+                Unfortunatly, the connection with the server has been lost.
+                <button type="button" class="button back" onclick="nitroclash.backToHomepage();" lang="en">Back to homepage</button>
+            </div>
+        </div>
+    </div>
+    <div id="kicked-inactivity">
+        <div class="popup">
+            <div class="content" lang="en">
+                You have been kicked out for inactivity.
+                <button type="button" class="button back" onclick="nitroclash.backToHomepage();" lang="en">Back to homepage</button>
+            </div>
+        </div>
+    </div>
+    <div id="level-progress" class="animated fadeInDown">
+        <div class="close"><img src="img/close.svg" onclick="Javascript: document.getElementById('level-progress').style.display='none';"></div>
+        <div class="text"><span lang="en">Level: </span><span id="current-level">4</span></div>
+        <div class="box">
+            <div class="bar" id="level-progress-value"></div>
+        </div>
+        <div class="rank"><span lang="en">Rank: </span><span id="current-rank">Beginner</span></div>
+    </div>
+    <div id="achievements" class="animated fadeInUp">
+        <div class="close"><img src="img/close.svg" onclick="Javascript: document.getElementById('achievements').style.display='none';"></div>
+        <div class="title" lang="en">Achievements</div>
+        <div id="achievement-list">
+            <div class="achievement">
+                <img src="img/a/1.png" title="First Goal">
+                <div class="descr">Determined Attacker</div>
+            </div>
+            <div class="achievement">
+                <img src="img/a/2.png" title="First Goal">
+                <div class="descr">Determined Attacker</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="players-tab">
+        <div class="fade-bg"></div>
+        <div class="center">
+            <table id="players-tab-table">
+
+            </table>
+        </div>
+    </div>
+
+    <div id="my-statistics" class="animated fadeIn">
+        <div class="fade-bg"></div>
+        <div class="center">
+            <div style="margin-bottom: 24px">
+                <img class="player-avatar" src="img/player-B.png">
+                <div id="ms-player-name" class="player-name">HockeyAddict</div>
+            </div>
+            <div class="level"><span lang="en">Level: </span><span id="ms-level">4</span></div>
+            <div class="bar-box">
+                <div class="bar" id="ms-level-progress-value"></div>
+            </div>
+            <div class="rank"><span lang="en">Rank: </span><span id="ms-rank">Beginner</span></div>
+            <div style="text-align: center">
+                <table class="stats-table">
+                    <tbody><tr>
+                        <td lang="en">Play time:</td>
+                        <td><span id="ms-play-time">12.6</span> hours</td>
+                    </tr>
+                    <tr>
+                        <td lang="en">Games played:</td>
+                        <td id="ms-games-played">54</td>
+                    </tr>
+                    <tr>
+                        <td lang="en">Games won:</td>
+                        <td><span id="ms-games-won">23</span> (<span id="ms-win-pct">56</span>%)</td>
+                    </tr>
+                    <tr>
+                        <td lang="en">MVP:</td>
+                        <td><span id="ms-mvp">12</span> (<span id="ms-mvp-pct">2</span>%)</td>
+                    </tr>
+                    <tr>
+                        <td lang="en">Goals:</td>
+                        <td><span id="ms-goals">233</span> (avg: <span id="ms-goal-pct">5</span>/game)</td>
+                    </tr>
+                    <tr>
+                        <td lang="en">Assists:</td>
+                        <td><span id="ms-assists">12</span> (avg: <span id="ms-assist-pct">0.6</span>/game)</td>
+                    </tr>
+                    <tr>
+                        <td lang="en">Saves:</td>
+                        <td><span id="ms-saves">6</span> (avg: <span id="ms-save-pct">0.12</span>/game)</td>
+                    </tr>
+                    <tr>
+                        <td lang="en">Shots:</td>
+                        <td><span id="ms-shots">263</span><span style="display:none">(goal/shot ratio: <span id="ms-shot-pct">23</span>%)</span>
+                        </td>
+                    </tr>
+                </tbody></table>
+            </div>
+            <div class="achievement-title"><span lang="en">Achievements:</span> <span id="ms-achievement-count">5</span>/50</div>
+            <div id="ms-achievement-list" class="achievement-list">
+                <div class="achievement" title="Make 10 shots on goal in a single game"><img src="img/a/1.png">
+                    <div class="title">Determined Attacker</div>
+                </div>
+            </div>
+
+            <button type="button" class="button close" onclick="document.getElementById('my-statistics').style.display='none';" lang="en">Close</button>
+        </div>
+    </div>
+    <div id="leaderboards">
+        <div class="fade-bg">
+            <button type="button" class="button close" onclick="document.getElementById('leaderboards').style.display='none';" lang="en">Close</button>
+            <div class="center">
+                <div class="title">Leaderboards</div>
+                <div id="leaderboards-metric-buttons" class="buttons">
+                    <button type="button" class="button">Total Points</button>
+                </div>
+                <div id="leaderboards-period-buttons" class="buttons">
+                    <button type="button" class="button">All time</button>
+                    <button type="button" class="button">Today</button>
+                    <button type="button" class="button">Yesterday</button>
+                    <button type="button" class="button">This week</button>
+                    <button type="button" class="button">Last week</button>
+                </div>
+                <table id="leaderboards-table">
+                    <tbody><tr><th>Rank</th>
+                    <th>Name</th>
+                    <th>Metric</th>
+                    </tr><tr>
+                        <td>1</td>
+                        <td class="player-name">Shooter</td>
+                        <td>12</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td class="player-name">Bumperman</td>
+                        <td>11</td>
+                    </tr>
+                </tbody></table>
+                <div class="footer">Only players with at least level 5 are listed. Refresh time: <span id="leaderboards-refresh-time"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="homepage">
+        <div class="background">
+            <div class="fade">
+                <div class="logo">
+                    <div class="anim">
+                        <img src="img/logo.png">
+                    </div>
+                </div>
+                <!--
+                <div id="youtube-live">
+                    <div class="title">Watch live!</div>
+                    <iframe width="356" height="200" src="https://www.youtube.com/embed/TG8sQK_dg28?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                </div>
+-->
+                <div id="create-team-bar" class="create-team-bar">
+                    <button id="create-team-button" class="button" type="button" onclick="nitroclash.createTeam();" lang="en">Create party</button>
+                    <div class="text" lang="en">Play with your friends
+                    </div>
+                </div>
+                <div id="team-bar" class="team-bar">
+                    <div class="text" lang="en">Share this link with your friends</div>
+                    <input id="team-share-link" type="text">
+                    <button class="button copy" type="button" onclick="document.getElementById('team-share-link').select(); document.execCommand('copy');">Copy</button>
+                    <div class="teammates-title" lang="en">Team 1:</div>
+                    <div id="teammates-list" class="teammates-list">
+                        <div><img src="img/Action-ok-icon.png"> Player1</div>
+                    </div>
+                    <div class="teammates-title" lang="en">Team 2:</div>
+                    <div id="teammates-list-2" class="teammates-list">
+                        <div><img src="img/Action-ok-icon.png"> Player1</div>
+                    </div>
+                    <button class="button leave" type="button" onclick="nitroclash.leaveTeam();" title="Leave team" lang="en">Leave party</button>
+                    <button class="button switch" type="button" onclick="nitroclash.switchSide();" title="Leave team" lang="en">Switch side</button>
+                    <div class="private-block"><input id="private-game" type="checkbox"><label for="private-game">Private game</label></div>
+                    <div id="team-chat-block">
+                        <div>
+                            Chat: <input id="team-chat-input" type="text" maxlength="64" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                        </div>
+                        <div id="team-chat-history">I scored!!!
+                            <br> Nice goal :)
+                        </div>
+                    </div>
+                </div>
+                <div id="settings" class="settings">
+                    <button type="button" class="button" onclick="document.getElementById('settings-popup').style.display='block';" lang="en">Settings</button>
+                    <button type="button" class="button" onclick="nitroclash.showLeaderboards();" lang="en">Leaderboards</button>
+                    <div id="unconnected-block">
+                        <button id="login-button" type="button" class="button" onclick="document.getElementById('login-popup').style.display='block';" lang="en">Login/Signup</button>
+                    </div>
+                    <div id="connected-block">
+                        <img id="profile-picture" src="img/close.svg">
+                        <button id="my-stats-button" type="button" class="button" onclick="nitroclash.showMyStats();" lang="en">My Statistics</button>
+                        <a href="#" onclick="nitroclash.logout()" title="Logout"><img src="img/logout.svg"></a>
+                    </div>
+                    <div id="login-text" class="text" lang="en">Create account to save/show your statistics</div>
+                </div>
+                <div class="bottom-bar">
+                    <div class="social-bar">
+                        <div class="text" lang="en">Stay informed of game updates</div>
+                        <a href="https://www.facebook.com/NitroClash.io/" target="_blank" title="Like on Facebook"><img src="img/i/facebook.svg" alt="facebook"></a>
+                        <a href="https://twitter.com/NitroClashio" target="_blank" title="Follow on Twitter"><img src="img/i/twitter.svg"></a>
+
+                        <a href="https://www.youtube.com/channel/UCkKX3NsmscbmSvKbmc-ECWA" target="_blank" title="Watch videos on YouTube"><img src="img/i/youtube.svg"></a>
+                        <a href="https://discord.gg/XPpNmhq" target="_blank" title="Chat on Discord"><img src="img/i/discord.svg"></a>
+
+                    </div>
+                    <!--
+                    <div class="share-bar">
+                        <div class="text" lang="en">Love the game ? Share it !</div>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=nitroclash.io" target="_blank" title="Share on Facebook"><img src="img/i/facebook.svg" alt="facebook"></a>
+                        <a href="https://twitter.com/home?status=I%20love%20this%20game%20!%20http%3A//nitroclash.io%20%23NitroClash.io" target="_blank" title="Tweet"><img src="img/i/twitter.svg"></a>
+                    </div>
+-->
+                    <div class="contact-bar">
+                        <div>
+                            <a href="#" onclick="nitroclash.showTutorial();">How To Play</a> -
+                            <a href="https://www.reddit.com/r/nitroclashio/" target="_blank" title="Discuss on reddit">Reddit</a> - <a href="privacypolicy.html">Privacy Policy</a> -
+                            <a href="#" title="Message us" onclick="document.getElementById('doorbell-button').click();">Contact us</a>
+
+                        </div>
+                    </div>
+                    <div class="io-games-bar"><a class="button back" title="Play more IO Games" href="http://iogames.space" target="_blank" lang="en">More IO Games</a></div>
+                </div>
+                <div id="homepage-content" class="content">
+                    <div class="left-box">
+                        <div class="inside">
+                            <div id="banner-on-homepage" class="left-pub">
+                                <div id="nitroclash-io_300x250">
+                                    <script type="text/javascript">
+                                        try {
+                                            aiptag.cmd.display.push(function() {
+                                                aipDisplayTag.display('nitroclash-io_300x250');
+                                            });
+                                        } catch (e) {}
+
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="middle-box">
+                        <div class="inside">
+                            <div id="homepage-loading" lang="en">Loading...</div>
+                            <div id="homepage-loaded">
+                                <input type="text" id="username" placeholder="username" maxlength="12" lang="en">
+                                <div class="gameModes">
+                                    <div id="gamemode-3" title="1 player per team" onclick="nitroclash.selectMode(3);">1 vs 1</div>
+                                    <div id="gamemode-2" title="2 players per team" onclick="nitroclash.selectMode(2);">2 vs 2</div>
+                                    <div id="gamemode-1" title="3 players per team" class="selected" onclick="nitroclash.selectMode(1);">3 vs 3</div>
+                                    <div id="gamemode-4" title="5 players per team" onclick="nitroclash.selectMode(4);">5 vs 5</div>
+                                    <br>
+                                    <div id="gamemode-0" style="font-size: 14px; height: 32px; line-height: 32px;" title="Old mode with more inertia" onclick="nitroclash.selectMode(0);">Classic</div>
+                                    <div id="gamemode-5" style="font-size: 14px; height: 32px; line-height: 32px;" title="Train alone on the pitch" onclick="nitroclash.selectMode(5);">Train</div>
+                                </div>
+                                <button id="play-button" type="button" class="button" onclick="nitroclash.clickPlay();" lang="en">Play</button>
+                                <div class="secondary-buttons">
+                                    <button id="spectate-button" type="button" class="button back" onclick="nitroclash.clickSpectate();" lang="en">Spectate</button>
+                                    <label class="button back" for="replay-file-input">Watch replay</label>
+                                    <input id="replay-file-input" type="file" accept=".ncr">
+                                </div>
+                                <div id="skin-editor">
+                                    <div id="skin-buttons" class="skin-buttons"> <label class="button back" for="blue-skin-input">Load blue skin</label><input id="blue-skin-input" type="file" accept="image/*"><label class="button back" for="red-skin-input">Load red skin</label><input id="red-skin-input" type="file" accept="image/*"></div>
+                                    <div class="game-sprites"><select id="skin-editor-game-sprites"></select><label class="button" for="skin-editor-input2">Replace game sprite</label><input id="skin-editor-input2" type="file" accept="image/*">
+                                    </div>
+                                </div>
+
+                                <div id="server-block" class="server">
+                                    <span class="label" lang="en">Server</span>
+                                    <span class="field"><select name="server" id="server">
+                                            <option>Loading...</option>
+                                        </select>
+                                    </span>
+                                </div>
+                                <!--
+                                <div class="feedback">Help improve the game by <a href onclick="document.getElementById('doorbell-button').click();return false;">giving feedback</a></div>
+-->
+                                <!--                                <div class="no-translation" id="no-translation">No translation for your language. <a href="http://pootle.nitroclash.io/projects/NITROCLASH/" target="_blank">Help us with translation</a></div>
+                                <div class="update-translation" id="update-translation">Missing or incorrect translation ? <a href="http://pootle.nitroclash.io/projects/NITROCLASH/" target="_blank">Help us with translation</a></div>-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-box">
+                        <div class="inside">
+                            <div class="title" lang="en">What's new ?</div>
+                            <ul>
+                                <li>
+                                    <div style="margin-bottom: 0.5em;"><b>2026-06-29</b>:
+                                        The World Cup is just around the corner, and sign-ups are now open!<br><br>
+                                        Are you ready to bring glory and success to your country? Then this is your chance.<br><br>
+                                        From July 17th to July 19th, we will be hosting our annual NCWC. <a href="https://discord.gg/Puh2YFpfmp" target="_blank">Click here to join the server</a>, sign up, and do not put your flags up in the air!<br><br>
+                                        We look forward to seeing you play.
+                                        <!-- reminder: width is set to 75% -->
+
+                                        <div style="text-align: center"><a href="https://discord.gg/Puh2YFpfmp" target="_blank"><img style="width: 100%; height: auto;" src="img/tournament44.png"></a></div>
+
+                                        <!--
+                                    <div><a href="https://discord.gg/XPpNmhq" target="_blank"><img style="width: 100%; height: auto;" src="img/tournament25.png"></a></div>
+-->
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <div class="watch-tourney">Watch: <button class="button" onclick="nitroclash.spectateTourney(3);" style="display: inline-block">1v1</button>
+                                <button class="button" onclick="nitroclash.spectateTourney(2);" style="display: inline-block">2v2</button>
+                                <button class="button" onclick="nitroclash.spectateTourney(1);" style="display: inline-block">3v3</button>
+                                <button class="button" onclick="nitroclash.spectateTourney(4);" style="display: inline-block">5v5</button>
+                                <button class="button" onclick="nitroclash.spectateTourney(0);" style="display: inline-block; padding: 4px 4px;">Classic</button>
+                            </div>
+
+                            <div class="more"><a target="_blank" href="changelog.html">more...</a></div>
+                            <div class="cp"><iframe id="cp-iframe" width="267" height="120" src="https://exodragon.com/cp/?from=nitroclash"></iframe></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="connecting-content" class="connecting">
+                    <div class="box">
+                        <div>
+                            <div class="title" lang="en">How to play</div>
+                        </div>
+                        <div>
+                            <div class="tuto-text" lang="en">
+                                <span lang="en">Objective:</span>
+                                <ul>
+                                    <li lang="en">Push the ball into the opponent goal</li>
+                                </ul>
+                                <span lang="en">Controls:</span>
+                                <ul id="control-mouse">
+                                    <li lang="en">Use your mouse cursor to control direction</li>
+                                    <li lang="en">Click mouse button to BOOST</li>
+                                    <li lang="en">Hold SPACE to BRAKE / STAND STILL</li>
+                                    <li><span lang="en">Press T to chat</span><span>. Press G then any 0-9 key for quickchat</span></li>
+                                    <li lang="en">Press TAB to display player statistics</li>
+                                </ul>
+                                <ul id="control-gamepad">
+                                    <li lang="en">Gamepad connected !</li>
+                                    <li lang="en">Use your gamepad stick to move</li>
+                                    <li lang="en">Click button 1 to BOOST</li>
+                                    <li lang="en">Release stick or click button 2 to BRAKE / STAND STILL</li>
+                                    <li lang="en">Press T to chat</li>
+                                </ul>
+                                <span lang="en">Camera:</span>
+                                <ul>
+                                    <li lang="en">Press C to switch between fullscreen or follow-player</li>
+                                    <li lang="en">In follow-player mode, press X to switch between
+                                        <ul>
+                                            <li lang="en">(1) centered on player</li>
+                                            <li lang="en">(2) centered on player and field</li>
+                                            <li lang="en">(3) fixed zoom (use mouse wheel to zoom in/out)</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="tuto-button">
+                            <div class="tuto-button">
+                                <button type="button" class="button" onclick="nitroclash.clickTutoButton()" lang="en">Enter game</button>
+                            </div>
+                        </div>
+                        <div id="connecting-message-row">
+                            <div class="message"><img class="spinner" src="img/ball3.png"><span id="connecting-message" lang="en">Connecting to server...</span></div>
+                        </div>
+
+                    </div>
+                    <div class="asset-load">.</div>
+                </div>
+
+                <div id="settings-popup" class="settings-popup animated fadeInDown">
+                    <div class="quality"><span lang="en">Graphics quality:</span>
+                        <button id="button-quality-high" type="button" class="button" onclick="nitroclash.setQuality(1);" lang="en">High</button>
+                        <button id="button-quality-medium" type="button" class="button unselected" onclick="nitroclash.setQuality(0.8);" lang="en">Medium</button>
+                        <button id="button-quality-low" type="button" class="button unselected" onclick="nitroclash.setQuality(0.6);" lang="en">Low</button>
+                        <div class="antialias"><span lang="en">Enable antialias (better quality, lower FPS):</span>
+                            <input type="checkbox" id="enableAntialias" onchange="nitroclash.setEnableAntialias(document.getElementById('enableAntialias').checked);">
+                        </div>
+                    </div>
+                    <div class="joystick mobile-only">
+                        Virtual joystick follows the finger <input type="checkbox" id="settings-follow-joysticks" checked="">
+                    </div>
+                    <div class="gamepad"><span lang="en">Use gamepad:</span>
+                        <input type="checkbox" id="useGamepad" onchange="nitroclash.setUseGamepad(document.getElementById('useGamepad').checked);">
+                        <div id="gamepad-detected">Gamepad detected.</div>
+                        <div id="gamepad-not-detected">Gamepad not detected (you may need to press any button)</div>
+                    </div>
+                    <div class="fullscreen"><span lang="en">Automatically switch fullscreen:</span>
+                        <input type="checkbox" id="autoSwitchFullscreen" onchange="nitroclash.setAutoFullscreen(document.getElementById('autoSwitchFullscreen').checked);">
+                    </div>
+                    <div style="margin-top: 3vh">
+                        <a style="color: lightgray; font-size: 0.8em" class="btn-privacy-settings" href="javascript:void(0)" onclick="if (typeof aipAPItag === 'undefined') alert('Disable your adblock'); else aipAPItag.showCMPScreen()">Privacy
+                            settings</a>
+                    </div>
+                    <button type="button" class="button close" onclick="document.getElementById('settings-popup').style.display='none';" lang="en">Close</button>
+                </div>
+
+                <div id="login-popup" class="login-popup animated fadeInDown">
+                    <table>
+                        <tbody><tr>
+                            <td>
+                                <div class="title">Google</div>
+                                <div id="g_id_onload" data-client_id="431108004043-g9oa44s2u8sjskrsb1tksq1g6urkgnmn.apps.googleusercontent.com" data-callback="onGoogleSignIn" data-auto_prompt="false" data-auto_select="true" data-cancel_on_tap_outside="false">
+                                </div>
+
+                                <div id="google-login-button" class="g_id_signin" data-type="standard" data-size="large" data-theme="filled_blue" data-text="signin_with" data-shape="rectangular" data-logo_alignment="left">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="title">Facebook</div>
+                                <div id="fb-login-button" class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="login_with" data-show-faces="false" data-auto-logout-link="true" data-use-continue-as="true" data-scope="email" onlogin="onFacebookLogin();"></div>
+                            </td>
+                        </tr>
+                    </tbody></table>
+
+                    <button type="button" class="button close" onclick="document.getElementById('login-popup').style.display='none';" lang="en">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div id="toasts"></div>
+
+    <!-- DOORBELL -->
+    <script type="text/javascript">
+        window.doorbellOptions = {
+            appKey: '3AWayLaE7HqeDfmwWuGbPONBCKQTcfMG86ffXRZjwACtei3iPy3Phi1Z0CVn4lss'
+        };
+        (function(w, d, t) {
+            var hasLoaded = false;
+
+            function l() {
+                if (hasLoaded) {
+                    return;
+                }
+                hasLoaded = true;
+                window.doorbellOptions.windowLoaded = true;
+                var g = d.createElement(t);
+                g.id = 'doorbellScript';
+                g.type = 'text/javascript';
+                g.async = true;
+                g.src = 'https://embed.doorbell.io/button/6538?t=' + (new Date().getTime());
+                (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(g);
+            }
+            if (w.attachEvent) {
+                w.attachEvent('onload', l);
+            } else if (w.addEventListener) {
+                w.addEventListener('load', l, false);
+            } else {
+                l();
+            }
+            if (d.readyState == 'complete') {
+                l();
+            }
+        }(window, document, 'script'));
+
+    </script>
+
+
+
+
+
+
+	<div id="preroll"></div>
+</body></html>

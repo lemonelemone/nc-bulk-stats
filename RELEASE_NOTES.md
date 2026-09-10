@@ -1,4 +1,9 @@
-# NitroClash Replay Tools v1.4.0
+# NitroClash Replay Tools v1.5.0
+
+- Changes the optional scoreboard timer to a five-minute regulation countdown.
+- Detects and removes recorded goal-celebration pauses from the displayed match clock.
+- Displays overtime as a count-up clock such as `+0:01`.
+- Restyles the blue score, centre timer and red score boxes to more closely match NitroClash.
 
 - Preserves the supplied latest NC Bulk Stats page, including Points in Match (NCSC) Stats.
 - Adds a separate NCR to MP4 clip-maker section.
@@ -21,4 +26,4 @@
 - Limits a single export to two minutes to protect browser memory.
 - Makes no changes to NitroClash gameplay, SUPER NC, userscripts, or servers.
 
-Tested in a real Microsoft Edge browser using the supplied 12:20 NCR replay, including both overlay states, aligned timelines, mouse-wheel zoom, and MP4 export. A 10-second 1080p follow-ball clip exported at 120 FPS as a 17.8 MB MP4 under the enabled 20 MB limit.
+Tested in a real Microsoft Edge browser using supplied NCR replays, including a regulation countdown, a timer frozen during a recorded goal celebration, and a `+0:02` overtime display. Both overlay states, aligned timelines, mouse-wheel zoom, and MP4 export were also tested. A 10-second 1080p follow-ball clip exported at 120 FPS as a 17.8 MB MP4 under the enabled 20 MB limit.
