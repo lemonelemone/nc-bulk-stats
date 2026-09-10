@@ -3,35 +3,149 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NC Bulk Stats</title>
+<title>NC Replay Tools</title>
+<link rel="icon" href="data:,">
 <style>
-  body { font-family: Arial, Helvetica, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 16px; }
-  h1 { font-size: 20px; }
-  #status { margin: 12px 0; font-size: 14px; color: #444; }
-  #status div { margin: 2px 0; }
-  table { border-collapse: collapse; width: 100%; margin-top: 16px; font-size: 14px; }
-  th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; white-space: nowrap; }
-  th { background: #f0f0f0; cursor: pointer; }
-  td.num, th.num { text-align: right; }
-  .actions { margin-top: 12px; }
-  button { padding: 6px 14px; margin-right: 8px; }
-  #dropzone { border: 2px dashed #aaa; border-radius: 6px; padding: 20px; text-align: center; }
-  #dropzone.drag-over { border-color: #666; background: #f5f5f5; }
-  #copyMsg { font-size: 13px; color: #2a7a2a; }
+  :root { color-scheme:dark; --bg:#08111f; --panel:#101d30; --panel2:#14243a; --field:#0b1727; --line:#2a3d57; --text:#eef5ff; --muted:#9fb0c6; --blue:#3d9bff; --green:#42d795; }
+  * { box-sizing:border-box; }
+  body { font-family:Arial,Helvetica,sans-serif; max-width:1180px; min-height:100vh; margin:0 auto; padding:28px 18px 60px; color:var(--text); background:radial-gradient(circle at 50% 0,#132842 0,var(--bg) 520px) fixed; }
+  h1 { font-size:20px; }
+  h2 { margin:0 0 8px; font-size:22px; }
+  p { color:var(--muted); }
+  code { color:#d9e9ff; }
+  .site-head { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:22px; }
+  .brand { display:block; font-size:24px; font-weight:800; letter-spacing:.02em; }
+  .tabs { display:flex; gap:8px; }
+  .tab { border:1px solid var(--line); background:var(--panel); color:var(--text); border-radius:9px; padding:9px 15px; cursor:pointer; }
+  .tab.active { background:var(--blue); border-color:var(--blue); color:#04101e; font-weight:700; }
+  .tool-section[hidden], .stats-part[hidden] { display:none !important; }
+  #status { margin:12px 0; font-size:14px; color:var(--muted); }
+  #status div { margin:2px 0; }
+  table { border-collapse:collapse; width:100%; margin-top:16px; font-size:14px; background:rgba(16,29,48,.82); }
+  th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; white-space:nowrap; }
+  th { background:var(--panel2); cursor:pointer; }
+  tbody tr:nth-child(even) { background:rgba(20,36,58,.55); }
+  tbody tr:hover { background:#172a43; }
+  td.num, th.num { text-align:right; }
+  .actions { margin-top:12px; }
+  button, select, input { font:inherit; }
+  button { padding:7px 14px; margin-right:8px; border:1px solid var(--line); border-radius:7px; background:var(--panel2); color:var(--text); cursor:pointer; }
+  button:hover:not(:disabled) { border-color:var(--blue); }
+  button:focus-visible, input:focus-visible, select:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  #dropzone { border:2px dashed #526982; border-radius:8px; padding:20px; text-align:center; background:rgba(16,29,48,.7); }
+  #dropzone.drag-over { border-color:var(--blue); background:var(--panel2); }
+  #copyMsg { font-size:13px; color:var(--green); }
+  .clip-layout { display:grid; grid-template-columns:minmax(0,1fr) 310px; gap:18px; align-items:start; }
+  .clip-card { min-width:0; margin-bottom:14px; padding:16px; border:1px solid var(--line); border-radius:13px; background:rgba(16,29,48,.92); box-shadow:0 16px 50px #0005; }
+  .clip-upload { border:2px dashed #526982; border-radius:10px; padding:14px; text-align:center; margin:14px 0; }
+  .clip-upload.drag-over { border-color:var(--blue); background:#162a45; }
+  #replayCanvas { display:block; width:100%; aspect-ratio:16/9; background:#050a11; border-radius:9px; border:1px solid #30445e; }
+  .transport, .clip-range-row { display:grid; grid-template-columns:44px minmax(0,1fr) auto; align-items:center; gap:10px; }
+  .transport { margin-top:10px; }
+  .transport button { width:44px; margin:0; padding-left:0; padding-right:0; }
+  #playhead { width:100%; margin:0; accent-color:var(--blue); }
+  .time-readout { min-width:112px; text-align:right; font-variant-numeric:tabular-nums; color:#dce9f8; }
+  .clip-range { position:relative; height:38px; margin:13px 0 4px; }
+  .clip-range-readout { visibility:hidden; }
+  .clip-range input[type=range] { position:absolute; width:100%; left:0; top:8px; margin:0; pointer-events:none; background:transparent; accent-color:var(--green); }
+  .clip-range input[type=range]::-webkit-slider-thumb { pointer-events:auto; }
+  .control-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:12px; }
+  label.control { display:flex; flex-direction:column; gap:5px; color:var(--muted); font-size:13px; }
+  label.control input, label.control select { width:100%; border:1px solid var(--line); border-radius:7px; padding:8px; background:var(--field); color:var(--text); }
+  .overlay-control { display:flex; flex-direction:column; gap:6px; color:var(--muted); font-size:13px; }
+  .overlay-control label { display:flex; align-items:center; gap:6px; color:var(--text); }
+  .overlay-control input { width:auto; margin:0; accent-color:var(--green); }
+  .clip-actions { display:flex; align-items:center; gap:10px; margin-top:14px; }
+  #exportMp4 { background:var(--green); color:#052116; border-color:var(--green); font-weight:800; }
+  #sizeLimit[aria-pressed="true"] { background:#163c31; border-color:var(--green); }
+  #exportStatus { color:var(--muted); font-size:13px; }
+  #exportProgress { width:100%; margin-top:10px; accent-color:var(--green); }
+  .privacy-note { font-size:12px; color:var(--muted); margin:9px 0 0; }
+  .event-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
+  .event-head h3 { margin:0; font-size:16px; }
+  #eventList { max-height:690px; overflow:auto; display:flex; flex-direction:column; gap:4px; }
+  .event-item { display:grid; grid-template-columns:48px 1fr; gap:7px; width:100%; margin:0; padding:8px; border:1px solid transparent; background:var(--field); color:var(--text); text-align:left; font-size:14px; }
+  .event-item:hover { background:#172a43; border-color:var(--line); }
+  .event-time { color:var(--blue); font-variant-numeric:tabular-nums; }
+  .event-label { overflow:hidden; text-overflow:ellipsis; }
+  .empty-events { color:var(--muted); font-size:13px; padding:18px 5px; }
+  @media (max-width:850px) { .clip-layout{grid-template-columns:1fr}.control-grid{grid-template-columns:repeat(2,1fr)}#eventList{max-height:300px}.site-head{align-items:flex-start;flex-direction:column} }
+  @media (max-width:560px) { body{padding:18px 10px 40px}.tabs{width:100%}.tab{flex:1}.control-grid{grid-template-columns:1fr}.clip-actions{align-items:stretch;flex-direction:column}.clip-actions button{margin:0;width:100%}.time-readout{min-width:auto;font-size:13px} }
 </style>
 </head>
 <body>
 
+<header class="site-head">
+  <div class="brand">NitroClash Replay Tools</div>
+  <nav class="tabs" aria-label="Tools">
+    <button class="tab active" data-tool="stats">Bulk Stats</button>
+    <button class="tab" data-tool="clips">NCR to MP4</button>
+  </nav>
+</header>
+
+<section id="statsSection" class="tool-section">
 <h1>NC Bulk Stats</h1>
 <p>Select or drag in any number of <code>.ncr</code> replay files.</p>
 
 <div id="dropzone">
   <input type="file" id="fileInput" multiple accept=".ncr">
 </div>
+</section>
 
-<div id="status"></div>
+<section id="clipsSection" class="tool-section" hidden>
+  <div class="clip-layout">
+    <main class="clip-card">
+      <h2>NCR Clip Maker</h2>
+      <p>Choose part of a replay, select a camera, then save it as an MP4.</p>
+      <div id="clipDropzone" class="clip-upload">
+        <input type="file" id="clipFileInput" accept=".ncr">
+        <div class="privacy-note">Your replay stays on this device and is never uploaded.</div>
+      </div>
 
-<div class="actions" id="actions" style="display:none">
+      <canvas id="replayCanvas" width="960" height="540"></canvas>
+      <div class="transport">
+        <button id="playPause" type="button" disabled aria-label="Play">▶</button>
+        <input id="playhead" type="range" min="0" max="0" value="0" step="0.001" disabled>
+        <span id="timeReadout" class="time-readout">0:00.000 / 0:00</span>
+      </div>
+
+      <div class="clip-range-row">
+        <span aria-hidden="true"></span>
+        <div class="clip-range" aria-label="Clip range">
+          <input id="clipStartSlider" type="range" min="0" max="0" value="0" step="0.017" disabled>
+          <input id="clipEndSlider" type="range" min="0" max="0" value="0" step="0.017" disabled>
+        </div>
+        <span id="clipRangeReadout" class="time-readout clip-range-readout" aria-hidden="true">0:00.000 / 0:00</span>
+      </div>
+
+      <div class="control-grid">
+        <label class="control">Clip starts at<input id="clipStart" value="0:00.000" disabled></label>
+        <label class="control">Clip ends at<input id="clipEnd" value="0:00.000" disabled></label>
+        <label class="control">Camera<select id="cameraMode" disabled><option value="full">Full field</option><option value="ball">Zoomed / follow ball</option></select></label>
+        <label class="control">Quality<select id="resolution" disabled><option value="1920x1080">1080p</option><option value="1280x720">720p</option><option value="854x480">480p</option></select></label>
+        <label class="control">Frame rate<select id="frameRate" disabled><option value="60">60 FPS (default)</option><option value="30">30 FPS</option><option value="120">120 FPS (smooth)</option></select></label>
+        <div class="overlay-control"><span>Video overlays</span><label><input id="showScoreboard" type="checkbox" disabled> Scoreboard &amp; timer</label><label><input id="showEvents" type="checkbox" disabled> Events</label></div>
+      </div>
+
+      <div class="clip-actions">
+        <button id="exportMp4" type="button" disabled>Download MP4</button>
+        <button id="sizeLimit" type="button" aria-pressed="false" disabled>Keep under 20 MB: Off</button>
+        <span id="exportStatus">Load an NCR replay to begin.</span>
+      </div>
+      <progress id="exportProgress" value="0" max="1" hidden></progress>
+    </main>
+
+    <aside class="clip-card">
+      <div class="event-head"><h3>Replay events</h3><span id="eventCount">0</span></div>
+      <div id="eventList"><div class="empty-events">Events will appear after you load a replay.</div></div>
+    </aside>
+  </div>
+</section>
+
+<div id="status" class="stats-part"></div>
+
+<div class="actions stats-part" id="actions" style="display:none">
   <button id="viewMatch">Per match</button>
   <button id="viewSummary">Summary</button>
   <button id="viewNcsc">Match (NCSC) Stats</button>
@@ -40,7 +154,7 @@
   <span id="copyMsg"></span>
 </div>
 
-<div id="tableScroll" style="overflow-x:auto; display:none;">
+<div id="tableScroll" class="stats-part" style="overflow-x:auto; display:none;">
 <table id="table">
   <thead><tr id="tableHead"></tr></thead>
   <tbody id="tableBody"></tbody>
@@ -555,5 +669,6 @@ function escapeHtml(s) {
   return div.innerHTML;
 }
 </script>
+<script type="module" src="converter.js"></script>
 </body>
 </html>
