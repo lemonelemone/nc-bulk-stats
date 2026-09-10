@@ -1,0 +1,638 @@
+import { Muxer, ArrayBufferTarget } from "./vendor/mp4-muxer.mjs";
+
+const SOURCE_FPS = 60;
+const WORLD_WIDTH = 100;
+const WORLD_HEIGHT = 56.25;
+const PLAYER_RADIUS = 0.6103515625;
+const BALL_RADIUS = 0.9765625;
+const TWENTY_MB = 20_000_000;
+const BOOST_POSITIONS = [
+  15.696192, 47.998825, 15.696192, 8.251172, 14.100928, 28.125,
+  35.927097, 34.41909, 35.927097, 21.83091, 50, 50.166016,
+  50, 34.41909, 50, 21.83091, 50, 6.0839844,
+  64.0729, 34.41909, 64.0729, 21.83091, 84.30381, 47.998825,
+  85.85269, 28.125, 84.30381, 8.251172
+];
+const EVENT_NAMES = [
+  "Goal", "Assist", "Save", "Long Goal", "Overtime Goal", "Hat Trick",
+  "Shot On Goal", "Center Ball", "Clear Ball", "First Touch", "Victory"
+];
+
+const $ = (id) => document.getElementById(id);
+const spriteFrames = {
+  ball: { x: 1432, y: 888, w: 128, h: 128 },
+  blue: { x: 132, y: 2, w: 128, h: 128 },
+  red: { x: 1432, y: 628, w: 128, h: 128 },
+  playerBoost: { x: 1174, y: 266, w: 96, h: 96 },
+  boostPad: { x: 2, y: 132, w: 128, h: 128 }
+};
+const gameAssets = { playfield: new Image(), sprites: new Image(), background: new Image(), ready: false };
+const gameAssetsReady = Promise.all([
+  loadImage(gameAssets.playfield, "./assets/playfield-1.png"),
+  loadImage(gameAssets.sprites, "./assets/spritesheet4.png"),
+  loadImage(gameAssets.background, "./assets/bgtile.png")
+]).then(() => { gameAssets.ready = true; drawPreview(); });
+
+const ui = {
+  stats: $("statsSection"), clips: $("clipsSection"), input: $("clipFileInput"),
+  dropzone: $("clipDropzone"), canvas: $("replayCanvas"), play: $("playPause"),
+  playhead: $("playhead"), readout: $("timeReadout"), rangeReadout: $("clipRangeReadout"), startSlider: $("clipStartSlider"),
+  endSlider: $("clipEndSlider"), start: $("clipStart"), end: $("clipEnd"),
+  camera: $("cameraMode"), resolution: $("resolution"), fps: $("frameRate"),
+  showScoreboard: $("showScoreboard"), showEvents: $("showEvents"),
+  export: $("exportMp4"), sizeLimit: $("sizeLimit"), exportStatus: $("exportStatus"), progress: $("exportProgress"),
+  eventList: $("eventList"), eventCount: $("eventCount")
+};
+
+let replay = null;
+let currentTime = 0;
+let playing = false;
+let previousAnimationTime = 0;
+let animationId = 0;
+let exporting = false;
+let followZoom = 1;
+
+document.querySelectorAll(".tab").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach((item) => item.classList.toggle("active", item === button));
+    const showClips = button.dataset.tool === "clips";
+    ui.stats.hidden = showClips;
+    document.querySelectorAll(".stats-part").forEach((element) => { element.hidden = showClips; });
+    ui.clips.hidden = !showClips;
+    if (!showClips) stopPlayback();
+    if (showClips && replay) drawPreview();
+  });
+});
+
+ui.input.addEventListener("change", () => loadReplayFile(ui.input.files[0]));
+ui.dropzone.addEventListener("dragover", (event) => {
+  event.preventDefault();
+  ui.dropzone.classList.add("drag-over");
+});
+ui.dropzone.addEventListener("dragleave", () => ui.dropzone.classList.remove("drag-over"));
+ui.dropzone.addEventListener("drop", (event) => {
+  event.preventDefault();
+  ui.dropzone.classList.remove("drag-over");
+  loadReplayFile(Array.from(event.dataTransfer.files).find((file) => file.name.toLowerCase().endsWith(".ncr")));
+});
+
+ui.play.addEventListener("click", () => playing ? stopPlayback() : startPlayback());
+ui.playhead.addEventListener("input", () => setCurrentTime(Number(ui.playhead.value)));
+ui.camera.addEventListener("change", drawPreview);
+ui.showScoreboard.addEventListener("change", drawPreview);
+ui.showEvents.addEventListener("change", drawPreview);
+ui.canvas.addEventListener("wheel", (event) => {
+  if (!replay || ui.camera.value !== "ball") return;
+  event.preventDefault();
+  followZoom = clamp(followZoom * Math.exp(-event.deltaY * .001), .65, 3);
+  updateCameraZoomLabel();
+  drawPreview();
+}, { passive: false });
+ui.startSlider.addEventListener("input", () => setClipBoundary("start", Number(ui.startSlider.value)));
+ui.endSlider.addEventListener("input", () => setClipBoundary("end", Number(ui.endSlider.value)));
+ui.start.addEventListener("change", () => setClipBoundary("start", parseTime(ui.start.value)));
+ui.end.addEventListener("change", () => setClipBoundary("end", parseTime(ui.end.value)));
+ui.sizeLimit.addEventListener("click", () => {
+  const enabled = ui.sizeLimit.getAttribute("aria-pressed") !== "true";
+  ui.sizeLimit.setAttribute("aria-pressed", String(enabled));
+  ui.sizeLimit.textContent = `Keep under 20 MB: ${enabled ? "On" : "Off"}`;
+});
+ui.export.addEventListener("click", exportMp4);
+
+async function loadReplayFile(file) {
+  if (!file) return;
+  stopPlayback();
+  setStatus("Reading replay…");
+  try {
+    const buffer = await file.arrayBuffer();
+    replay = parseNcr(buffer, file.name);
+    followZoom = 1;
+    updateCameraZoomLabel();
+    currentTime = 0;
+    const duration = replay.duration;
+    for (const element of [ui.playhead, ui.startSlider, ui.endSlider]) {
+      element.max = String(duration);
+      element.disabled = false;
+    }
+    ui.playhead.value = "0";
+    ui.startSlider.value = "0";
+    ui.endSlider.value = String(Math.min(duration, 10));
+    for (const element of [ui.play, ui.start, ui.end, ui.camera, ui.resolution, ui.fps, ui.showScoreboard, ui.showEvents, ui.export, ui.sizeLimit]) {
+      element.disabled = false;
+    }
+    ui.start.value = formatTime(0, true);
+    ui.end.value = formatTime(Math.min(duration, 10), true);
+    renderEvents();
+    setStatus(`${file.name} • ${formatTime(duration)} • ${replay.playerCount} players • ${replay.events.length} events`);
+    updateReadout();
+    drawPreview();
+  } catch (error) {
+    console.error(error);
+    replay = null;
+    setStatus(`Couldn’t read this replay: ${error.message}`);
+  }
+}
+
+function parseNcr(buffer, filename) {
+  const view = new DataView(buffer);
+  if (view.byteLength < 17) throw new Error("file is too small");
+  const version = view.getInt32(0, false);
+  const layout = view.getUint8(4);
+  const map = view.getInt32(5, false);
+  const frameCount = view.getInt32(9, false);
+  if (version !== 1 || frameCount <= 0 || frameCount > 10_000_000) throw new Error("unsupported NCR format");
+
+  const candidates = [];
+  for (let playerCount = 2; playerCount <= 20; playerCount += 2) {
+    for (let boostCount = 0; boostCount <= 64; boostCount++) {
+      const frameSize = 4 + 33 * playerCount + 24 + boostCount;
+      const footerOffset = 13 + frameCount * frameSize;
+      if (footerOffset + 4 > view.byteLength) continue;
+      const parsed = tryParseEvents(view, footerOffset, frameCount);
+      if (parsed) candidates.push({ playerCount, boostCount, frameSize, footerOffset, events: parsed });
+    }
+  }
+  if (!candidates.length) throw new Error("could not find the replay frames");
+  candidates.sort((a, b) => scoreCandidate(b) - scoreCandidate(a));
+  const format = candidates[0];
+  return {
+    buffer, view, filename, version, layout, map, frameCount,
+    duration: (frameCount - 1) / SOURCE_FPS,
+    ...format
+  };
+}
+
+function scoreCandidate(candidate) {
+  return (candidate.boostCount === 14 ? 100 : 0) + (candidate.playerCount <= 10 ? 20 : 0) + candidate.events.length;
+}
+
+function tryParseEvents(view, offset, frameCount) {
+  const eventCount = view.getInt32(offset, false);
+  if (eventCount < 0 || eventCount > 100_000) return null;
+  const events = [];
+  let pos = offset + 4;
+  try {
+    for (let i = 0; i < eventCount; i++) {
+      if (pos + 13 > view.byteLength) return null;
+      const tick = view.getInt32(pos, false);
+      const type = view.getUint8(pos + 4);
+      const slot1 = view.getUint8(pos + 5);
+      const slot2 = view.getUint8(pos + 6);
+      const speed = view.getFloat32(pos + 7, false);
+      const nameLength = view.getUint16(pos + 11, false);
+      const size = 13 + nameLength * 2;
+      if (tick < 0 || tick > frameCount + 600 || nameLength > 1000 || pos + size > view.byteLength) return null;
+      let name = "";
+      for (let j = 0; j < nameLength; j++) name += String.fromCharCode(view.getUint16(pos + 13 + j * 2, false));
+      events.push({ tick, type, slot1, slot2, speed, name });
+      pos += size;
+    }
+  } catch (_) {
+    return null;
+  }
+  return pos === view.byteLength ? events : null;
+}
+
+function readFrame(time) {
+  const exact = clamp(time * SOURCE_FPS, 0, replay.frameCount - 1);
+  const aIndex = Math.floor(exact);
+  const bIndex = Math.min(aIndex + 1, replay.frameCount - 1);
+  const alpha = exact - aIndex;
+  const a = readRawFrame(aIndex);
+  const b = alpha ? readRawFrame(bIndex) : a;
+  const players = a.players.map((player, index) => ({
+    x: lerp(player.x, b.players[index].x, alpha),
+    y: lerp(player.y, b.players[index].y, alpha),
+    angle: lerpAngle(player.angle, b.players[index].angle, alpha),
+    boost: player.boost
+  }));
+  return {
+    tick: exact,
+    players,
+    boosts: a.boosts,
+    ball: {
+      x: lerp(a.ball.x, b.ball.x, alpha),
+      y: lerp(a.ball.y, b.ball.y, alpha),
+      angle: lerpAngle(a.ball.angle, b.ball.angle, alpha)
+    }
+  };
+}
+
+function readRawFrame(index) {
+  const { view, frameSize, playerCount } = replay;
+  let pos = 13 + index * frameSize + 4;
+  const players = [];
+  for (let i = 0; i < playerCount; i++) {
+    players.push({
+      x: view.getFloat32(pos + 4 * i, false),
+      y: view.getFloat32(pos + 4 * playerCount + 4 * i, false),
+      angle: view.getFloat32(pos + 8 * playerCount + 4 * i, false),
+      boost: view.getUint8(pos + 32 * playerCount + i) > 0
+    });
+  }
+  pos += 33 * playerCount;
+  const ballPos = pos;
+  const boosts = [];
+  for (let i = 0; i < replay.boostCount; i++) boosts.push(view.getUint8(ballPos + 24 + i) > 0);
+  return {
+    players,
+    boosts,
+    ball: {
+      x: view.getFloat32(ballPos, false),
+      y: view.getFloat32(ballPos + 4, false),
+      angle: view.getFloat32(ballPos + 8, false)
+    }
+  };
+}
+
+function renderFrame(canvas, time, cameraMode, showScoreboard, showEvents, zoom = 1) {
+  const ctx = canvas.getContext("2d", { alpha: false });
+  const width = canvas.width;
+  const height = canvas.height;
+  const state = readFrame(time);
+  const full = cameraMode === "full";
+  let worldWidth = full ? 94 : 52 / zoom;
+  let worldHeight = full ? 52.25 : worldWidth * height / width;
+  const aspect = width / height;
+  if (worldHeight * aspect < worldWidth) worldHeight = worldWidth / aspect;
+  else worldWidth = worldHeight * aspect;
+  let cx = 50;
+  let cy = WORLD_HEIGHT / 2;
+  if (!full) {
+    cx = clamp(state.ball.x, worldWidth / 2, WORLD_WIDTH - worldWidth / 2);
+    cy = clamp(state.ball.y, worldHeight / 2, WORLD_HEIGHT - worldHeight / 2);
+  }
+  const scale = width / worldWidth;
+  const worldLeft = cx - worldWidth / 2;
+  const worldTop = cy - worldHeight / 2;
+  const sx = (x) => (x - worldLeft) * scale;
+  const sy = (y) => (y - worldTop) * scale;
+
+  const backgroundPattern = gameAssets.ready ? ctx.createPattern(gameAssets.background, "repeat") : null;
+  if (backgroundPattern?.setTransform) backgroundPattern.setTransform(new DOMMatrix().scale(Math.max(1, scale * .1)));
+  ctx.fillStyle = backgroundPattern || "#eef0f1";
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.save();
+  if (gameAssets.ready) {
+    ctx.drawImage(gameAssets.playfield, sx(0), sy(0), WORLD_WIDTH * scale, WORLD_HEIGHT * scale);
+  } else {
+    ctx.fillStyle = "#6ca017";
+    ctx.fillRect(sx(0), sy(0), WORLD_WIDTH * scale, WORLD_HEIGHT * scale);
+  }
+
+  const tick = Math.floor(time * SOURCE_FPS);
+  if (gameAssets.ready) drawBoostPads(ctx, sx, sy, scale, state.boosts);
+  for (let i = 0; i < state.players.length; i++) drawPlayer(ctx, sx, sy, scale, state.players[i], i, nameAt(i, tick));
+  drawBall(ctx, sx(state.ball.x), sy(state.ball.y), 2 * BALL_RADIUS * 1.1 * scale, state.ball.angle);
+  ctx.restore();
+
+  if (showScoreboard) drawScoreboard(ctx, width, time, tick);
+  if (showEvents) drawRecentEvent(ctx, width, height, tick);
+}
+
+function drawBoostPads(ctx, sx, sy, scale, activeBoosts) {
+  const size = 47.918 / 2048 * WORLD_WIDTH * scale;
+  const count = Math.min(activeBoosts.length, BOOST_POSITIONS.length / 2);
+  for (let i = 0; i < count; i++) {
+    if (!activeBoosts[i]) continue;
+    drawSprite(ctx, spriteFrames.boostPad, sx(BOOST_POSITIONS[i * 2]), sy(BOOST_POSITIONS[i * 2 + 1]), size, 0);
+  }
+}
+
+function drawPlayer(ctx, sx, sy, scale, player, slot, name) {
+  if (!Number.isFinite(player.x) || !Number.isFinite(player.y)) return;
+  const x = sx(player.x), y = sy(player.y);
+  const size = 2 * PLAYER_RADIUS * scale;
+  if (gameAssets.ready && player.boost) drawSprite(ctx, spriteFrames.playerBoost, x, y, size * 1.2, player.angle);
+  if (gameAssets.ready) drawSprite(ctx, slot % 2 === 0 ? spriteFrames.blue : spriteFrames.red, x, y, size, player.angle);
+  else {
+    ctx.fillStyle = slot % 2 === 0 ? "#304b9b" : "#d77945";
+    ctx.beginPath(); ctx.arc(x, y, size / 2, 0, Math.PI * 2); ctx.fill();
+  }
+  if (name) {
+    ctx.font = `bold ${Math.max(10, widthScaled(14, ctx.canvas.width))}px Arial`;
+    ctx.textAlign = "center";
+    ctx.fillStyle = "rgba(0,0,0,.62)";
+    const labelY = y - size * .72;
+    ctx.fillText(name.slice(0, 16), x, labelY);
+  }
+}
+
+function drawBall(ctx, x, y, size, angle) {
+  if (gameAssets.ready) drawSprite(ctx, spriteFrames.ball, x, y, size, angle);
+  else { ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(x, y, size / 2, 0, Math.PI * 2); ctx.fill(); }
+}
+
+function drawSprite(ctx, frame, x, y, size, angle) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  ctx.drawImage(gameAssets.sprites, frame.x, frame.y, frame.w, frame.h, -size / 2, -size / 2, size, size);
+  ctx.restore();
+}
+
+function drawScoreboard(ctx, width, time, tick) {
+  let blue = 0, red = 0;
+  for (const event of replay.events) {
+    if (event.tick > tick) break;
+    if (event.type === 202) event.slot1 % 2 === 0 ? blue++ : red++;
+  }
+  const unit = width / 1920;
+  const scoreWidth = 64 * unit;
+  const timeWidth = 104 * unit;
+  const gap = 2 * unit;
+  const boxWidth = scoreWidth * 2 + timeWidth + gap * 2;
+  const x = (width - boxWidth) / 2;
+  const y = 8 * unit;
+  const h = 57 * unit;
+  const border = Math.max(2, 4 * unit);
+  ctx.save();
+  ctx.lineWidth = border;
+  ctx.fillStyle = "#3b4f8f"; ctx.strokeStyle = "#132561"; roundRect(ctx, x, y, scoreWidth, h, 12 * unit); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "#fff"; ctx.strokeStyle = "#000"; ctx.beginPath(); ctx.rect(x + scoreWidth + gap, y, timeWidth, h); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "#d37647"; ctx.strokeStyle = "#8f390d"; roundRect(ctx, x + scoreWidth + timeWidth + gap * 2, y, scoreWidth, h, 12 * unit); ctx.fill(); ctx.stroke();
+  ctx.font = `bold ${Math.max(16, 36 * unit)}px Arial`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillStyle = "white"; ctx.fillText(String(blue), x + scoreWidth / 2, y + h * .47);
+  ctx.fillStyle = "black"; ctx.fillText(formatTime(time), x + scoreWidth + gap + timeWidth / 2, y + h * .47);
+  ctx.fillStyle = "white"; ctx.fillText(String(red), x + scoreWidth + timeWidth + gap * 2 + scoreWidth / 2, y + h * .47);
+  ctx.restore();
+}
+
+function drawRecentEvent(ctx, width, height, tick) {
+  let recent = null;
+  for (const event of replay.events) {
+    if (event.tick > tick) break;
+    if (event.type !== 0 && event.type !== 1) recent = event;
+  }
+  if (!recent || tick - recent.tick > 105) return;
+  const label = eventLabel(recent);
+  ctx.save(); ctx.font = `800 ${Math.max(17, width * .017)}px Arial`; ctx.textAlign = "center";
+  const textWidth = ctx.measureText(label).width + 38;
+  ctx.fillStyle = "rgba(4,10,18,.82)"; roundRect(ctx, (width - textWidth) / 2, height * .82, textWidth, 44, 9); ctx.fill();
+  ctx.fillStyle = "#fff"; ctx.fillText(label, width / 2, height * .82 + 29); ctx.restore();
+}
+
+function nameAt(slot, tick) {
+  let name = "";
+  for (const event of replay.events) {
+    if (event.tick > tick) break;
+    if (event.slot1 !== slot) continue;
+    if (event.type === 200) name = event.name;
+    if (event.type === 201) name = "";
+  }
+  return name;
+}
+
+function eventLabel(event) {
+  const player = nameAt(event.slot1, event.tick) || `Player ${event.slot1 + 1}`;
+  if (event.type < 200) return `${EVENT_NAMES[event.type] || `Event ${event.type}`} by ${player}`;
+  if (event.type === 200) return `Player joins: ${event.name}`;
+  if (event.type === 201) return `Player leaves: ${event.name || player}`;
+  if (event.type === 202) {
+    const assist = event.slot2 !== 255 ? nameAt(event.slot2, event.tick) : "";
+    return `Goal by ${player}${assist ? ` assisted by ${assist}` : ""} (${Math.ceil(event.speed * 5)} km/h)`;
+  }
+  if (event.type === 203) return "Overtime";
+  return `Event ${event.type}`;
+}
+
+function renderEvents() {
+  const visible = replay.events.filter((event) => event.type !== 0 && event.type !== 1);
+  ui.eventCount.textContent = String(visible.length);
+  ui.eventList.innerHTML = "";
+  if (!visible.length) {
+    ui.eventList.innerHTML = '<div class="empty-events">No displayable events in this replay.</div>';
+    return;
+  }
+  for (const event of visible) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "event-item";
+    button.innerHTML = `<span class="event-time">${formatTime(event.tick / SOURCE_FPS)}</span><span class="event-label"></span>`;
+    button.querySelector(".event-label").textContent = eventLabel(event);
+    button.addEventListener("click", () => setCurrentTime(event.tick / SOURCE_FPS));
+    ui.eventList.appendChild(button);
+  }
+}
+
+function startPlayback() {
+  if (!replay || exporting) return;
+  if (currentTime >= replay.duration) currentTime = 0;
+  playing = true;
+  previousAnimationTime = performance.now();
+  ui.play.textContent = "❚❚";
+  animationId = requestAnimationFrame(playbackStep);
+}
+
+function playbackStep(now) {
+  if (!playing) return;
+  currentTime = Math.min(replay.duration, currentTime + (now - previousAnimationTime) / 1000);
+  previousAnimationTime = now;
+  ui.playhead.value = String(currentTime);
+  updateReadout();
+  drawPreview();
+  if (currentTime >= replay.duration) stopPlayback();
+  else animationId = requestAnimationFrame(playbackStep);
+}
+
+function stopPlayback() {
+  playing = false;
+  cancelAnimationFrame(animationId);
+  ui.play.textContent = "▶";
+}
+
+function setCurrentTime(value) {
+  if (!replay) return;
+  currentTime = clamp(value, 0, replay.duration);
+  ui.playhead.value = String(currentTime);
+  updateReadout();
+  drawPreview();
+}
+
+function setClipBoundary(which, value) {
+  if (!replay || !Number.isFinite(value)) return;
+  let start = Number(ui.startSlider.value);
+  let end = Number(ui.endSlider.value);
+  const oldLength = Math.max(1 / SOURCE_FPS, end - start);
+  if (which === "start") {
+    start = clamp(value, 0, replay.duration - 1 / SOURCE_FPS);
+    if (start >= end) end = Math.min(replay.duration, start + oldLength);
+  } else {
+    end = clamp(value, 1 / SOURCE_FPS, replay.duration);
+    if (end <= start) start = Math.max(0, end - oldLength);
+  }
+  ui.startSlider.value = String(start);
+  ui.endSlider.value = String(end);
+  ui.start.value = formatTime(start, true);
+  ui.end.value = formatTime(end, true);
+  setCurrentTime(which === "start" ? start : end);
+}
+
+function updateReadout() {
+  const text = `${formatTime(currentTime, true)} / ${formatTime(replay ? replay.duration : 0)}`;
+  ui.readout.textContent = text;
+  ui.rangeReadout.textContent = text;
+}
+
+function drawPreview() {
+  if (!replay) {
+    const ctx = ui.canvas.getContext("2d");
+    ctx.fillStyle = "#050a11"; ctx.fillRect(0, 0, ui.canvas.width, ui.canvas.height);
+    ctx.fillStyle = "#8294aa"; ctx.font = "22px Arial"; ctx.textAlign = "center";
+    ctx.fillText("Load an NCR replay to preview it", ui.canvas.width / 2, ui.canvas.height / 2);
+    return;
+  }
+  renderFrame(ui.canvas, currentTime, ui.camera.value, ui.showScoreboard.checked, ui.showEvents.checked, followZoom);
+}
+
+async function exportMp4() {
+  if (!replay || exporting) return;
+  stopPlayback();
+  if (!("VideoEncoder" in window)) {
+    setStatus("This browser cannot create MP4 video. Please use current Chrome or Edge.");
+    return;
+  }
+  const start = Number(ui.startSlider.value);
+  const end = Number(ui.endSlider.value);
+  const fps = Number(ui.fps.value);
+  const [width, height] = ui.resolution.value.split("x").map(Number);
+  const duration = end - start;
+  if (!(duration > 0)) return setStatus("Choose a clip end after its start.");
+  if (duration > 120) return setStatus("Please keep one clip at 2 minutes or less.");
+
+  exporting = true;
+  lockControls(true);
+  ui.progress.hidden = false;
+  ui.progress.value = 0;
+  setStatus("Preparing MP4 encoder…");
+
+  try {
+    await gameAssetsReady;
+    const keepUnderLimit = ui.sizeLimit.getAttribute("aria-pressed") === "true";
+    const normalBitrate = width >= 1900 ? (fps === 120 ? 24_000_000 : 14_000_000) : (width >= 1200 ? 8_000_000 : 4_000_000);
+    let bitrate = keepUnderLimit ? Math.min(normalBitrate, Math.floor(19_000_000 * 8 / duration)) : normalBitrate;
+    let blob = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      blob = await encodeClip({ start, end, fps, width, height, bitrate, camera: ui.camera.value, showScoreboard: ui.showScoreboard.checked, showEvents: ui.showEvents.checked, zoom: followZoom, attempt });
+      if (!keepUnderLimit || blob.size <= TWENTY_MB) break;
+      bitrate = Math.max(250_000, Math.floor(bitrate * 19_000_000 / blob.size));
+      setStatus(`File was ${formatBytes(blob.size)}; reducing it below 20 MB…`);
+    }
+    if (keepUnderLimit && blob.size > TWENTY_MB) throw new Error("this clip could not be reduced below 20 MB; shorten it slightly and try again");
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const base = replay.filename.replace(/\.ncr$/i, "").replace(/[^a-z0-9_-]+/gi, "_");
+    link.href = url;
+    link.download = `${base}_${fileTime(start)}-${fileTime(end)}_${ui.camera.value}_${fps}fps.mp4`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
+    setStatus(`MP4 ready • ${formatBytes(blob.size)} • ${fps} FPS${keepUnderLimit ? " • under 20 MB" : ""}`);
+  } catch (error) {
+    console.error(error);
+    setStatus(`Couldn’t create the MP4: ${error.message}`);
+  } finally {
+    exporting = false;
+    lockControls(false);
+    ui.progress.hidden = true;
+    drawPreview();
+  }
+}
+
+function lockControls(locked) {
+  for (const element of [ui.input, ui.play, ui.playhead, ui.startSlider, ui.endSlider, ui.start, ui.end, ui.camera, ui.resolution, ui.fps, ui.showScoreboard, ui.showEvents, ui.export, ui.sizeLimit]) {
+    element.disabled = locked;
+  }
+}
+
+async function encodeClip({ start, end, fps, width, height, bitrate, camera, showScoreboard, showEvents, zoom, attempt }) {
+  const codecCandidates = fps === 120 ? ["avc1.640033", "avc1.4d0033", "avc1.420033"] : ["avc1.640028", "avc1.4d0028", "avc1.42001f"];
+  let config = null;
+  for (const codec of codecCandidates) {
+    const candidate = { codec, width, height, bitrate, framerate: fps, hardwareAcceleration: "prefer-hardware", latencyMode: "quality" };
+    const support = await VideoEncoder.isConfigSupported(candidate);
+    if (support.supported) { config = support.config; break; }
+  }
+  if (!config) throw new Error(`${width}×${height} at ${fps} FPS is not supported by this browser/device`);
+
+  const target = new ArrayBufferTarget();
+  const muxer = new Muxer({ target, video: { codec: "avc", width, height }, fastStart: "in-memory", firstTimestampBehavior: "offset" });
+  let encoderError = null;
+  const encoder = new VideoEncoder({
+    output: (chunk, metadata) => muxer.addVideoChunk(chunk, metadata),
+    error: (error) => { encoderError = error; }
+  });
+  encoder.configure(config);
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const totalFrames = Math.max(1, Math.ceil((end - start) * fps));
+  const frameDuration = Math.round(1_000_000 / fps);
+  for (let frameNumber = 0; frameNumber < totalFrames; frameNumber++) {
+    if (encoderError) throw encoderError;
+    renderFrame(canvas, Math.min(end, start + frameNumber / fps), camera, showScoreboard, showEvents, zoom);
+    const frame = new VideoFrame(canvas, { timestamp: frameNumber * frameDuration, duration: frameDuration });
+    encoder.encode(frame, { keyFrame: frameNumber % (fps * 2) === 0 });
+    frame.close();
+    if (encoder.encodeQueueSize > 8 || frameNumber % 12 === 0) await new Promise((resolve) => setTimeout(resolve, 0));
+    if (frameNumber % 4 === 0 || frameNumber === totalFrames - 1) {
+      ui.progress.value = (frameNumber + 1) / totalFrames;
+      setStatus(`${attempt ? "Reducing file" : "Creating MP4"}… ${Math.round(ui.progress.value * 100)}%`);
+    }
+  }
+  await encoder.flush();
+  encoder.close();
+  if (encoderError) throw encoderError;
+  muxer.finalize();
+  return new Blob([target.buffer], { type: "video/mp4" });
+}
+
+function setStatus(message) { ui.exportStatus.textContent = message; }
+function updateCameraZoomLabel() {
+  const option = ui.camera.querySelector('option[value="ball"]');
+  option.textContent = `Zoomed / follow ball (${followZoom.toFixed(2)}×)`;
+}
+function lerp(a, b, t) { return a + (b - a) * t; }
+function lerpAngle(a, b, t) {
+  let delta = (b - a) % (Math.PI * 2);
+  if (delta > Math.PI) delta -= Math.PI * 2;
+  if (delta < -Math.PI) delta += Math.PI * 2;
+  return a + delta * t;
+}
+function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
+function widthScaled(pixelsAt1080p, canvasWidth) { return pixelsAt1080p * canvasWidth / 1920; }
+function loadImage(image, source) {
+  return new Promise((resolve, reject) => {
+    image.onload = resolve;
+    image.onerror = () => reject(new Error(`could not load ${source}`));
+    image.src = source;
+  });
+}
+function roundRect(ctx, x, y, width, height, radius) {
+  if (typeof ctx.roundRect === "function") ctx.beginPath(), ctx.roundRect(x, y, width, height, radius);
+  else {
+    const r = Math.min(radius, Math.abs(width) / 2, Math.abs(height) / 2);
+    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + width, y, x + width, y + height, r);
+    ctx.arcTo(x + width, y + height, x, y + height, r); ctx.arcTo(x, y + height, x, y, r);
+    ctx.arcTo(x, y, x + width, y, r); ctx.closePath();
+  }
+}
+function formatTime(seconds, milliseconds = false) {
+  const safe = Math.max(0, Number(seconds) || 0);
+  const minutes = Math.floor(safe / 60);
+  const whole = Math.floor(safe % 60);
+  return `${minutes}:${String(whole).padStart(2, "0")}${milliseconds ? `.${String(Math.floor((safe % 1) * 1000)).padStart(3, "0")}` : ""}`;
+}
+function parseTime(text) {
+  const value = String(text).trim();
+  if (/^\d+(?:\.\d+)?$/.test(value)) return Number(value);
+  const match = value.match(/^(\d+):([0-5]?\d(?:\.\d+)?)$/);
+  return match ? Number(match[1]) * 60 + Number(match[2]) : NaN;
+}
+function fileTime(seconds) { return formatTime(seconds, true).replace(":", "m").replace(".", "s"); }
+function formatBytes(bytes) {
+  if (bytes < 1_000_000) return `${Math.round(bytes / 1000)} KB`;
+  return `${(bytes / 1_000_000).toFixed(1)} MB`;
+}
+
+drawPreview();
