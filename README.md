@@ -1,4 +1,4 @@
-# NitroClash Replay Tools v1.5.2
+# NitroClash Replay Tools v1.5.3
 
 This release keeps NC Bulk Stats and adds a separate **NCR to MP4** section.
 
@@ -21,6 +21,8 @@ The optional scoreboard now matches NitroClash more closely. Its timer counts do
 Version 1.5.1 uses NitroClash's original Cartwheel scoreboard font and original compact dimensions, replacing the oversized v1.5.0 overlay.
 
 Version 1.5.2 preserves a visible gap between all three scoreboard boxes at preview and export resolutions.
+
+Version 1.5.3 makes an event click move both the blue replay playhead and the second green clip-end handle to the event timestamp.
 
 ## Public-site files
 

@@ -1,4 +1,6 @@
-# NitroClash Replay Tools v1.5.2
+# NitroClash Replay Tools v1.5.3
+
+- Clicking a replay event now moves the blue playhead and green clip-end marker together.
 
 - Keeps a visible gap between the blue score, timer and red score boxes after canvas scaling.
 

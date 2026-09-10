@@ -455,7 +455,7 @@ function renderEvents() {
     button.className = "event-item";
     button.innerHTML = `<span class="event-time">${formatTime(event.tick / SOURCE_FPS)}</span><span class="event-label"></span>`;
     button.querySelector(".event-label").textContent = eventLabel(event);
-    button.addEventListener("click", () => setCurrentTime(event.tick / SOURCE_FPS));
+    button.addEventListener("click", () => setClipBoundary("end", event.tick / SOURCE_FPS));
     ui.eventList.appendChild(button);
   }
 }
