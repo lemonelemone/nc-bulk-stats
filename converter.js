@@ -32,7 +32,8 @@ const gameAssets = { playfield: new Image(), sprites: new Image(), background: n
 const gameAssetsReady = Promise.all([
   loadImage(gameAssets.playfield, "./assets/playfield-1.png"),
   loadImage(gameAssets.sprites, "./assets/spritesheet4.png"),
-  loadImage(gameAssets.background, "./assets/bgtile.png")
+  loadImage(gameAssets.background, "./assets/bgtile.png"),
+  document.fonts?.load ? document.fonts.load("36px Cartwheel") : Promise.resolve()
 ]).then(() => { gameAssets.ready = true; drawPreview(); });
 
 const ui = {
@@ -379,21 +380,23 @@ function drawScoreboard(ctx, width, time, tick) {
     if (event.tick > tick) break;
     if (event.type === 202) event.slot1 % 2 === 0 ? blue++ : red++;
   }
-  const unit = width / 1280;
-  const scoreWidth = 98 * unit;
-  const timeWidth = 156 * unit;
-  const gap = 5 * unit;
+  const unit = width / 1920;
+  const scoreWidth = 64 * unit;
+  const timeWidth = 104 * unit;
+  // Canvas strokes extend outside each box, so allow enough room to retain
+  // NitroClash's visible two-pixel separation between the border edges.
+  const gap = Math.max(3, 6 * unit);
   const boxWidth = scoreWidth * 2 + timeWidth + gap * 2;
   const x = (width - boxWidth) / 2;
-  const y = 12 * unit;
-  const h = 60 * unit;
+  const y = 8 * unit;
+  const h = 56 * unit;
   const border = Math.max(2, 4 * unit);
   ctx.save();
   ctx.lineWidth = border;
-  ctx.fillStyle = "rgba(75,100,180,.22)"; ctx.strokeStyle = "#17275f"; roundRect(ctx, x, y, scoreWidth, h, 15 * unit); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "rgba(59,79,143,.35)"; ctx.strokeStyle = "#132561"; roundRect(ctx, x, y, scoreWidth, h, 12 * unit); ctx.fill(); ctx.stroke();
   ctx.fillStyle = "rgba(205,205,205,.76)"; ctx.strokeStyle = "#111"; ctx.beginPath(); ctx.rect(x + scoreWidth + gap, y, timeWidth, h); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = "rgba(190,105,65,.22)"; ctx.strokeStyle = "#84401e"; roundRect(ctx, x + scoreWidth + timeWidth + gap * 2, y, scoreWidth, h, 15 * unit); ctx.fill(); ctx.stroke();
-  ctx.font = `900 ${Math.max(18, 40 * unit)}px "Arial Black", Impact, Arial`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillStyle = "rgba(211,118,71,.35)"; ctx.strokeStyle = "#8f390d"; roundRect(ctx, x + scoreWidth + timeWidth + gap * 2, y, scoreWidth, h, 12 * unit); ctx.fill(); ctx.stroke();
+  ctx.font = `700 ${Math.max(12, 36 * unit)}px Cartwheel, Arial`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
   ctx.fillStyle = "#050505"; ctx.fillText(String(blue), x + scoreWidth / 2, y + h * .49);
   ctx.fillText(matchClockAt(time * SOURCE_FPS), x + scoreWidth + gap + timeWidth / 2, y + h * .49);
   ctx.fillText(String(red), x + scoreWidth + timeWidth + gap * 2 + scoreWidth / 2, y + h * .49);

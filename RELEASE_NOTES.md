@@ -1,4 +1,9 @@
-# NitroClash Replay Tools v1.5.0
+# NitroClash Replay Tools v1.5.2
+
+- Keeps a visible gap between the blue score, timer and red score boxes after canvas scaling.
+
+- Uses NitroClash's original Cartwheel scoreboard font.
+- Restores the game's compact scoreboard measurements so the overlay no longer looks oversized or squashed.
 
 - Changes the optional scoreboard timer to a five-minute regulation countdown.
 - Detects and removes recorded goal-celebration pauses from the displayed match clock.

@@ -1,4 +1,4 @@
-# NitroClash Replay Tools v1.5.0
+# NitroClash Replay Tools v1.5.2
 
 This release keeps NC Bulk Stats and adds a separate **NCR to MP4** section.
 
@@ -17,6 +17,10 @@ This release keeps NC Bulk Stats and adds a separate **NCR to MP4** section.
 Use an up-to-date version of Microsoft Edge or Google Chrome. The converter runs locally in the browser; replay files are not uploaded.
 
 The optional scoreboard now matches NitroClash more closely. Its timer counts down from 5:00 during regulation, pauses during recorded goal celebrations, and counts up as `+0:01`, `+0:02`, and so on in overtime.
+
+Version 1.5.1 uses NitroClash's original Cartwheel scoreboard font and original compact dimensions, replacing the oversized v1.5.0 overlay.
+
+Version 1.5.2 preserves a visible gap between all three scoreboard boxes at preview and export resolutions.
 
 ## Public-site files
 
