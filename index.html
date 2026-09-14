@@ -60,6 +60,22 @@
   .clip-actions { display:flex; align-items:center; gap:10px; margin-top:14px; }
   #exportMp4 { background:var(--green); color:#052116; border-color:var(--green); font-weight:800; }
   #sizeLimit[aria-pressed="true"] { background:#163c31; border-color:var(--green); }
+  .quality-warning { display:none; margin:10px 0 0; padding:9px 11px; border:1px solid #c89735; border-radius:8px; background:#3a2a0f; color:#ffd98a; font-size:13px; }
+  .quality-warning.visible { display:block; }
+  .appearance { margin-top:14px; border:1px solid var(--line); border-radius:10px; background:var(--field); }
+  .appearance summary { padding:11px 13px; cursor:pointer; color:var(--text); font-weight:700; }
+  .appearance-body { padding:0 13px 13px; }
+  .appearance-note { margin:0 0 10px; font-size:12px; }
+  .skin-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; }
+  .skin-item { min-width:0; padding:9px; border:1px solid var(--line); border-radius:8px; background:var(--panel); }
+  .skin-item strong { display:block; margin-bottom:6px; font-size:12px; }
+  .skin-item input[type=file] { width:100%; color:var(--muted); font-size:11px; }
+  .skin-item button { width:100%; margin:7px 0 0; padding:5px 7px; font-size:11px; }
+  .skin-state { display:block; margin-top:5px; color:var(--muted); font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .character-colours { display:flex; align-items:center; flex-wrap:wrap; gap:10px 14px; margin-top:11px; color:var(--text); font-size:12px; }
+  .character-colours label { display:flex; align-items:center; gap:6px; }
+  .character-colours input[type=color] { width:34px; height:27px; padding:2px; border:1px solid var(--line); border-radius:6px; background:var(--panel2); }
+  #resetAppearance { margin:0 0 0 auto; }
   #exportStatus { color:var(--muted); font-size:13px; }
   #exportProgress { width:100%; margin-top:10px; accent-color:var(--green); }
   .privacy-note { font-size:12px; color:var(--muted); margin:9px 0 0; }
@@ -71,8 +87,8 @@
   .event-time { color:var(--blue); font-variant-numeric:tabular-nums; }
   .event-label { overflow:hidden; text-overflow:ellipsis; }
   .empty-events { color:var(--muted); font-size:13px; padding:18px 5px; }
-  @media (max-width:850px) { .clip-layout{grid-template-columns:1fr}.control-grid{grid-template-columns:repeat(2,1fr)}#eventList{max-height:300px}.site-head{align-items:flex-start;flex-direction:column} }
-  @media (max-width:560px) { body{padding:18px 10px 40px}.tabs{width:100%}.tab{flex:1}.control-grid{grid-template-columns:1fr}.clip-actions{align-items:stretch;flex-direction:column}.clip-actions button{margin:0;width:100%}.time-readout{min-width:auto;font-size:13px} }
+  @media (max-width:850px) { .clip-layout{grid-template-columns:1fr}.control-grid{grid-template-columns:repeat(2,1fr)}.skin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#eventList{max-height:300px}.site-head{align-items:flex-start;flex-direction:column} }
+  @media (max-width:560px) { body{padding:18px 10px 40px}.tabs{width:100%}.tab{flex:1}.control-grid,.skin-grid{grid-template-columns:1fr}.clip-actions{align-items:stretch;flex-direction:column}.clip-actions button{margin:0;width:100%}.character-colours{align-items:flex-start;flex-direction:column}.character-colours #resetAppearance{margin:0;width:100%}.time-readout{min-width:auto;font-size:13px} }
 </style>
 </head>
 <body>
@@ -125,15 +141,36 @@
         <label class="control">Clip ends at<input id="clipEnd" value="0:00.000" disabled></label>
         <label class="control">Camera<select id="cameraMode" disabled><option value="full">Full field</option><option value="ball">Zoomed / follow ball</option></select></label>
         <label class="control">Quality<select id="resolution" disabled><option value="1920x1080">1080p</option><option value="1280x720">720p</option><option value="854x480">480p</option></select></label>
-        <label class="control">Frame rate<select id="frameRate" disabled><option value="60">60 FPS (default)</option><option value="30">30 FPS</option><option value="120">120 FPS (smooth)</option></select></label>
+        <label class="control">Frame rate<select id="frameRate" disabled><option value="60">60 FPS (default)</option><option value="30">30 FPS</option><option value="120">120 FPS (smooth)</option><option value="240">240 FPS (experimental)</option></select></label>
         <div class="overlay-control"><span>Video overlays</span><label><input id="showScoreboard" type="checkbox" disabled> Scoreboard &amp; timer</label><label><input id="showEvents" type="checkbox" disabled> Events</label></div>
       </div>
+
+      <details class="appearance">
+        <summary>Match appearance</summary>
+        <div class="appearance-body">
+          <p class="appearance-note">Optional: use the same PNG, JPG or WebP assets as your game. Your latest choices are saved only in this browser.</p>
+          <div class="skin-grid">
+            <div class="skin-item"><strong>Pitch</strong><input id="skinPitch" data-skin="pitch" type="file" accept="image/png,image/jpeg,image/webp"><span class="skin-state" data-skin-state="pitch">Default</span><button type="button" data-skin-reset="pitch">Use default</button></div>
+            <div class="skin-item"><strong>Background / bgtile</strong><input id="skinBackground" data-skin="background" type="file" accept="image/png,image/jpeg,image/webp"><span class="skin-state" data-skin-state="background">Default</span><button type="button" data-skin-reset="background">Use default</button></div>
+            <div class="skin-item"><strong>Ball</strong><input id="skinBall" data-skin="ball" type="file" accept="image/png,image/jpeg,image/webp"><span class="skin-state" data-skin-state="ball">Default</span><button type="button" data-skin-reset="ball">Use default</button></div>
+            <div class="skin-item"><strong>Blue character</strong><input id="skinBlue" data-skin="blue" type="file" accept="image/png,image/jpeg,image/webp"><span class="skin-state" data-skin-state="blue">Default</span><button type="button" data-skin-reset="blue">Use default</button></div>
+            <div class="skin-item"><strong>Red character</strong><input id="skinRed" data-skin="red" type="file" accept="image/png,image/jpeg,image/webp"><span class="skin-state" data-skin-state="red">Default</span><button type="button" data-skin-reset="red">Use default</button></div>
+          </div>
+          <div class="character-colours">
+            <label><input id="tintCharacters" type="checkbox"> Recolour characters</label>
+            <label>Blue <input id="blueCharacterColour" type="color" value="#3b4f8f" disabled></label>
+            <label>Red <input id="redCharacterColour" type="color" value="#d37647" disabled></label>
+            <button id="resetAppearance" type="button">Reset all</button>
+          </div>
+        </div>
+      </details>
 
       <div class="clip-actions">
         <button id="exportMp4" type="button" disabled>Download MP4</button>
         <button id="sizeLimit" type="button" aria-pressed="false" disabled>Keep under 20 MB: Off</button>
         <span id="exportStatus">Load an NCR replay to begin.</span>
       </div>
+      <div id="qualityWarning" class="quality-warning" role="status">240 FPS with the 20 MB limit is likely to reduce image quality. Shorter clips will look better.</div>
       <progress id="exportProgress" value="0" max="1" hidden></progress>
     </main>
 

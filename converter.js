@@ -8,6 +8,11 @@ const WORLD_HEIGHT = 56.25;
 const PLAYER_RADIUS = 0.6103515625;
 const BALL_RADIUS = 0.9765625;
 const TWENTY_MB = 20_000_000;
+const APPEARANCE_DB = "nc-replay-tools-appearance";
+const APPEARANCE_STORE = "assets";
+const APPEARANCE_SETTINGS = "nc-replay-tools-appearance-settings";
+const SKIN_TYPES = ["pitch", "background", "ball", "blue", "red"];
+const MAX_SKIN_BYTES = 5 * 1024 * 1024;
 const BOOST_POSITIONS = [
   15.696192, 47.998825, 15.696192, 8.251172, 14.100928, 28.125,
   35.927097, 34.41909, 35.927097, 21.83091, 50, 50.166016,
@@ -28,13 +33,21 @@ const spriteFrames = {
   playerBoost: { x: 1174, y: 266, w: 96, h: 96 },
   boostPad: { x: 2, y: 132, w: 128, h: 128 }
 };
-const gameAssets = { playfield: new Image(), sprites: new Image(), background: new Image(), ready: false };
+const gameAssets = { playfield: new Image(), sprites: new Image(), background: new Image(), custom: {}, ready: false };
+const customAssetUrls = new Map();
+const customAssetNames = new Map();
+const tintedPlayers = { blue: null, red: null };
 const gameAssetsReady = Promise.all([
   loadImage(gameAssets.playfield, "./assets/playfield-1.png"),
   loadImage(gameAssets.sprites, "./assets/spritesheet4.png"),
   loadImage(gameAssets.background, "./assets/bgtile.png"),
   document.fonts?.load ? document.fonts.load("36px Cartwheel") : Promise.resolve()
-]).then(() => { gameAssets.ready = true; drawPreview(); });
+]).then(async () => {
+  gameAssets.ready = true;
+  await restoreAppearance();
+  rebuildTintedPlayers();
+  drawPreview();
+});
 
 const ui = {
   stats: $("statsSection"), clips: $("clipsSection"), input: $("clipFileInput"),
@@ -44,7 +57,9 @@ const ui = {
   camera: $("cameraMode"), resolution: $("resolution"), fps: $("frameRate"),
   showScoreboard: $("showScoreboard"), showEvents: $("showEvents"),
   export: $("exportMp4"), sizeLimit: $("sizeLimit"), exportStatus: $("exportStatus"), progress: $("exportProgress"),
-  eventList: $("eventList"), eventCount: $("eventCount")
+  eventList: $("eventList"), eventCount: $("eventCount"), qualityWarning: $("qualityWarning"),
+  tintCharacters: $("tintCharacters"), blueColour: $("blueCharacterColour"), redColour: $("redCharacterColour"),
+  resetAppearance: $("resetAppearance")
 };
 
 let replay = null;
@@ -54,6 +69,7 @@ let previousAnimationTime = 0;
 let animationId = 0;
 let exporting = false;
 let followZoom = 1;
+let appearanceSettings = readAppearanceSettings();
 
 document.querySelectorAll(".tab").forEach((button) => {
   button.addEventListener("click", () => {
@@ -82,6 +98,7 @@ ui.dropzone.addEventListener("drop", (event) => {
 ui.play.addEventListener("click", () => playing ? stopPlayback() : startPlayback());
 ui.playhead.addEventListener("input", () => setCurrentTime(Number(ui.playhead.value)));
 ui.camera.addEventListener("change", drawPreview);
+ui.fps.addEventListener("change", updateQualityWarning);
 ui.showScoreboard.addEventListener("change", drawPreview);
 ui.showEvents.addEventListener("change", drawPreview);
 ui.canvas.addEventListener("wheel", (event) => {
@@ -99,8 +116,31 @@ ui.sizeLimit.addEventListener("click", () => {
   const enabled = ui.sizeLimit.getAttribute("aria-pressed") !== "true";
   ui.sizeLimit.setAttribute("aria-pressed", String(enabled));
   ui.sizeLimit.textContent = `Keep under 20 MB: ${enabled ? "On" : "Off"}`;
+  updateQualityWarning();
 });
 ui.export.addEventListener("click", exportMp4);
+
+document.querySelectorAll("[data-skin]").forEach((input) => input.addEventListener("change", () => importSkin(input.dataset.skin, input.files?.[0])));
+document.querySelectorAll("[data-skin-reset]").forEach((button) => button.addEventListener("click", () => resetSkin(button.dataset.skinReset)));
+ui.tintCharacters.checked = appearanceSettings.tint;
+ui.blueColour.value = appearanceSettings.blue;
+ui.redColour.value = appearanceSettings.red;
+syncCharacterColourControls();
+ui.tintCharacters.addEventListener("change", () => {
+  appearanceSettings.tint = ui.tintCharacters.checked;
+  saveAppearanceSettings();
+  syncCharacterColourControls();
+  rebuildTintedPlayers();
+  drawPreview();
+});
+for (const input of [ui.blueColour, ui.redColour]) input.addEventListener("input", () => {
+  appearanceSettings.blue = ui.blueColour.value;
+  appearanceSettings.red = ui.redColour.value;
+  saveAppearanceSettings();
+  rebuildTintedPlayers();
+  drawPreview();
+});
+ui.resetAppearance.addEventListener("click", resetAllAppearance);
 
 async function loadReplayFile(file) {
   if (!file) return;
@@ -310,14 +350,15 @@ function renderFrame(canvas, time, cameraMode, showScoreboard, showEvents, zoom 
   const sx = (x) => (x - worldLeft) * scale;
   const sy = (y) => (y - worldTop) * scale;
 
-  const backgroundPattern = gameAssets.ready ? ctx.createPattern(gameAssets.background, "repeat") : null;
+  const backgroundImage = gameAssets.custom.background || gameAssets.background;
+  const backgroundPattern = gameAssets.ready ? ctx.createPattern(backgroundImage, "repeat") : null;
   if (backgroundPattern?.setTransform) backgroundPattern.setTransform(new DOMMatrix().scale(Math.max(1, scale * .1)));
   ctx.fillStyle = backgroundPattern || "#eef0f1";
   ctx.fillRect(0, 0, width, height);
 
   ctx.save();
   if (gameAssets.ready) {
-    ctx.drawImage(gameAssets.playfield, sx(0), sy(0), WORLD_WIDTH * scale, WORLD_HEIGHT * scale);
+    ctx.drawImage(gameAssets.custom.pitch || gameAssets.playfield, sx(0), sy(0), WORLD_WIDTH * scale, WORLD_HEIGHT * scale);
   } else {
     ctx.fillStyle = "#6ca017";
     ctx.fillRect(sx(0), sy(0), WORLD_WIDTH * scale, WORLD_HEIGHT * scale);
@@ -347,7 +388,7 @@ function drawPlayer(ctx, sx, sy, scale, player, slot, name) {
   const x = sx(player.x), y = sy(player.y);
   const size = 2 * PLAYER_RADIUS * scale;
   if (gameAssets.ready && player.boost) drawSprite(ctx, spriteFrames.playerBoost, x, y, size * 1.2, player.angle);
-  if (gameAssets.ready) drawSprite(ctx, slot % 2 === 0 ? spriteFrames.blue : spriteFrames.red, x, y, size, player.angle);
+  if (gameAssets.ready) drawPlayerSprite(ctx, slot % 2 === 0 ? "blue" : "red", x, y, size, player.angle);
   else {
     ctx.fillStyle = slot % 2 === 0 ? "#304b9b" : "#d77945";
     ctx.beginPath(); ctx.arc(x, y, size / 2, 0, Math.PI * 2); ctx.fill();
@@ -362,8 +403,196 @@ function drawPlayer(ctx, sx, sy, scale, player, slot, name) {
 }
 
 function drawBall(ctx, x, y, size, angle) {
-  if (gameAssets.ready) drawSprite(ctx, spriteFrames.ball, x, y, size, angle);
+  if (gameAssets.custom.ball) drawWholeImage(ctx, gameAssets.custom.ball, x, y, size, angle);
+  else if (gameAssets.ready) drawSprite(ctx, spriteFrames.ball, x, y, size, angle);
   else { ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(x, y, size / 2, 0, Math.PI * 2); ctx.fill(); }
+}
+
+function drawPlayerSprite(ctx, team, x, y, size, angle) {
+  if (appearanceSettings.tint && tintedPlayers[team]) drawWholeImage(ctx, tintedPlayers[team], x, y, size, angle);
+  else if (gameAssets.custom[team]) drawWholeImage(ctx, gameAssets.custom[team], x, y, size, angle);
+  else drawSprite(ctx, spriteFrames[team], x, y, size, angle);
+}
+
+function drawWholeImage(ctx, image, x, y, size, angle) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  ctx.drawImage(image, -size / 2, -size / 2, size, size);
+  ctx.restore();
+}
+
+function readAppearanceSettings() {
+  const defaults = { tint: false, blue: "#3b4f8f", red: "#d37647" };
+  try {
+    const saved = JSON.parse(localStorage.getItem(APPEARANCE_SETTINGS) || "null");
+    return {
+      tint: saved?.tint === true,
+      blue: /^#[0-9a-f]{6}$/i.test(saved?.blue || "") ? saved.blue : defaults.blue,
+      red: /^#[0-9a-f]{6}$/i.test(saved?.red || "") ? saved.red : defaults.red
+    };
+  } catch (_) {
+    return defaults;
+  }
+}
+
+function saveAppearanceSettings() {
+  try { localStorage.setItem(APPEARANCE_SETTINGS, JSON.stringify(appearanceSettings)); } catch (_) {}
+}
+
+function openAppearanceDb() {
+  return new Promise((resolve, reject) => {
+    if (!("indexedDB" in window)) return reject(new Error("saved browser storage is unavailable"));
+    const request = indexedDB.open(APPEARANCE_DB, 1);
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains(APPEARANCE_STORE)) request.result.createObjectStore(APPEARANCE_STORE);
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error("could not open saved browser storage"));
+  });
+}
+
+async function appearanceDbRequest(mode, action) {
+  const db = await openAppearanceDb();
+  try {
+    return await new Promise((resolve, reject) => {
+      const transaction = db.transaction(APPEARANCE_STORE, mode);
+      const store = transaction.objectStore(APPEARANCE_STORE);
+      const request = action(store);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error || new Error("could not update saved appearance"));
+    });
+  } finally {
+    db.close();
+  }
+}
+
+function setSkinState(type, name = "") {
+  const state = document.querySelector(`[data-skin-state="${type}"]`);
+  if (!state) return;
+  state.textContent = name ? `Custom: ${name}` : "Default";
+  state.title = name || "Default";
+}
+
+async function imageFromBlob(type, blob, name) {
+  const previous = customAssetUrls.get(type);
+  if (previous) URL.revokeObjectURL(previous);
+  const url = URL.createObjectURL(blob);
+  const image = new Image();
+  try {
+    await loadImage(image, url);
+  } catch (error) {
+    URL.revokeObjectURL(url);
+    throw error;
+  }
+  customAssetUrls.set(type, url);
+  customAssetNames.set(type, name || "saved image");
+  gameAssets.custom[type] = image;
+  setSkinState(type, customAssetNames.get(type));
+}
+
+async function restoreAppearance() {
+  try {
+    for (const type of SKIN_TYPES) {
+      const saved = await appearanceDbRequest("readonly", (store) => store.get(type));
+      if (saved?.blob instanceof Blob) await imageFromBlob(type, saved.blob, saved.name);
+      else setSkinState(type);
+    }
+  } catch (error) {
+    console.warn("Could not restore saved appearance", error);
+  }
+}
+
+async function importSkin(type, file) {
+  if (!SKIN_TYPES.includes(type) || !file) return;
+  if (!file.type.startsWith("image/")) return setStatus("Please choose a PNG, JPG or WebP image.");
+  if (file.size > MAX_SKIN_BYTES) return setStatus("Please keep each appearance image at 5 MB or less.");
+  try {
+    await imageFromBlob(type, file, file.name);
+    await appearanceDbRequest("readwrite", (store) => store.put({ blob: file, name: file.name, updatedAt: Date.now() }, type));
+    rebuildTintedPlayers();
+    drawPreview();
+    setStatus(`${file.name} saved as your ${type === "pitch" ? "pitch" : type} appearance.`);
+  } catch (error) {
+    console.error(error);
+    setStatus(`Couldn’t use that image: ${error.message}`);
+  } finally {
+    const input = document.querySelector(`[data-skin="${type}"]`);
+    if (input) input.value = "";
+  }
+}
+
+async function resetSkin(type) {
+  if (!SKIN_TYPES.includes(type)) return;
+  try { await appearanceDbRequest("readwrite", (store) => store.delete(type)); } catch (error) { console.warn(error); }
+  const url = customAssetUrls.get(type);
+  if (url) URL.revokeObjectURL(url);
+  customAssetUrls.delete(type);
+  customAssetNames.delete(type);
+  delete gameAssets.custom[type];
+  setSkinState(type);
+  rebuildTintedPlayers();
+  drawPreview();
+}
+
+async function resetAllAppearance() {
+  try { await appearanceDbRequest("readwrite", (store) => store.clear()); } catch (error) { console.warn(error); }
+  for (const url of customAssetUrls.values()) URL.revokeObjectURL(url);
+  customAssetUrls.clear();
+  customAssetNames.clear();
+  gameAssets.custom = {};
+  for (const type of SKIN_TYPES) setSkinState(type);
+  appearanceSettings = { tint: false, blue: "#3b4f8f", red: "#d37647" };
+  ui.tintCharacters.checked = false;
+  ui.blueColour.value = appearanceSettings.blue;
+  ui.redColour.value = appearanceSettings.red;
+  saveAppearanceSettings();
+  syncCharacterColourControls();
+  rebuildTintedPlayers();
+  drawPreview();
+  setStatus("Match appearance reset to the NitroClash defaults.");
+}
+
+function syncCharacterColourControls() {
+  ui.blueColour.disabled = !ui.tintCharacters.checked;
+  ui.redColour.disabled = !ui.tintCharacters.checked;
+}
+
+function rebuildTintedPlayers() {
+  tintedPlayers.blue = null;
+  tintedPlayers.red = null;
+  if (!appearanceSettings.tint || !gameAssets.ready) return;
+  for (const team of ["blue", "red"]) {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 128;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    const custom = gameAssets.custom[team];
+    if (custom) ctx.drawImage(custom, 0, 0, 128, 128);
+    else {
+      const frame = spriteFrames[team];
+      ctx.drawImage(gameAssets.sprites, frame.x, frame.y, frame.w, frame.h, 0, 0, 128, 128);
+    }
+    const pixels = ctx.getImageData(0, 0, 128, 128);
+    const data = pixels.data;
+    let maxGray = 0;
+    for (let index = 0; index < data.length; index += 4) {
+      if (!data[index + 3]) continue;
+      const gray = .299 * data[index] + .587 * data[index + 1] + .114 * data[index + 2];
+      data[index] = data[index + 1] = data[index + 2] = gray;
+      maxGray = Math.max(maxGray, gray);
+    }
+    const colour = appearanceSettings[team];
+    const rgb = [1, 3, 5].map((offset) => parseInt(colour.slice(offset, offset + 2), 16));
+    const normalize = maxGray > 0 ? 255 / maxGray : 1;
+    for (let index = 0; index < data.length; index += 4) {
+      const gray = Math.min(255, data[index] * normalize);
+      data[index] = gray * rgb[0] / 255;
+      data[index + 1] = gray * rgb[1] / 255;
+      data[index + 2] = gray * rgb[2] / 255;
+    }
+    ctx.putImageData(pixels, 0, 0);
+    tintedPlayers[team] = canvas;
+  }
 }
 
 function drawSprite(ctx, frame, x, y, size, angle) {
@@ -554,7 +783,8 @@ async function exportMp4() {
   try {
     await gameAssetsReady;
     const keepUnderLimit = ui.sizeLimit.getAttribute("aria-pressed") === "true";
-    const normalBitrate = width >= 1900 ? (fps === 120 ? 24_000_000 : 14_000_000) : (width >= 1200 ? 8_000_000 : 4_000_000);
+    const highRate = fps >= 240 ? 2.8 : (fps >= 120 ? 1.7 : 1);
+    const normalBitrate = Math.round((width >= 1900 ? 14_000_000 : (width >= 1200 ? 8_000_000 : 4_000_000)) * highRate);
     let bitrate = keepUnderLimit ? Math.min(normalBitrate, Math.floor(19_000_000 * 8 / duration)) : normalBitrate;
     let blob = null;
     for (let attempt = 0; attempt < 3; attempt++) {
@@ -590,17 +820,26 @@ function lockControls(locked) {
 }
 
 async function encodeClip({ start, end, fps, width, height, bitrate, camera, showScoreboard, showEvents, zoom, attempt }) {
-  const codecCandidates = fps === 120 ? ["avc1.640033", "avc1.4d0033", "avc1.420033"] : ["avc1.640028", "avc1.4d0028", "avc1.42001f"];
+  const codecCandidates = fps >= 240
+    ? ["avc1.640034", "avc1.4d0034", "avc1.420034"]
+    : (fps >= 120 ? ["avc1.640033", "avc1.4d0033", "avc1.420033"] : ["avc1.640028", "avc1.4d0028", "avc1.42001f"]);
   let config = null;
   for (const codec of codecCandidates) {
-    const candidate = { codec, width, height, bitrate, framerate: fps, hardwareAcceleration: "prefer-hardware", latencyMode: "quality" };
-    const support = await VideoEncoder.isConfigSupported(candidate);
-    if (support.supported) { config = support.config; break; }
+    const candidates = [
+      { codec, width, height, bitrate, framerate: fps, hardwareAcceleration: "prefer-hardware", latencyMode: "quality" },
+      { codec, width, height, bitrate, framerate: Math.min(fps, 120), hardwareAcceleration: "prefer-software", latencyMode: "quality" },
+      { codec, width, height, bitrate, framerate: Math.min(fps, 60), latencyMode: "quality" }
+    ];
+    for (const candidate of candidates) {
+      const support = await VideoEncoder.isConfigSupported(candidate);
+      if (support.supported) { config = support.config; break; }
+    }
+    if (config) break;
   }
   if (!config) throw new Error(`${width}×${height} at ${fps} FPS is not supported by this browser/device`);
 
   const target = new ArrayBufferTarget();
-  const muxer = new Muxer({ target, video: { codec: "avc", width, height }, fastStart: "in-memory", firstTimestampBehavior: "offset" });
+  const muxer = new Muxer({ target, video: { codec: "avc", width, height, frameRate: fps }, fastStart: "in-memory", firstTimestampBehavior: "offset" });
   let encoderError = null;
   const encoder = new VideoEncoder({
     output: (chunk, metadata) => muxer.addVideoChunk(chunk, metadata),
@@ -632,6 +871,10 @@ async function encodeClip({ start, end, fps, width, height, bitrate, camera, sho
 }
 
 function setStatus(message) { ui.exportStatus.textContent = message; }
+function updateQualityWarning() {
+  const visible = Number(ui.fps.value) === 240 && ui.sizeLimit.getAttribute("aria-pressed") === "true";
+  ui.qualityWarning.classList.toggle("visible", visible);
+}
 function updateCameraZoomLabel() {
   const option = ui.camera.querySelector('option[value="ball"]');
   option.textContent = `Zoomed / follow ball (${followZoom.toFixed(2)}×)`;

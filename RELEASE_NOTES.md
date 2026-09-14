@@ -1,4 +1,18 @@
-# NitroClash Replay Tools v1.5.3
+# NitroClash Replay Tools v1.6.1
+
+- Fixes the five individual **Use default** buttons. Pitch, background/bgtile, ball and both character assets now return to the built-in NitroClash asset immediately and remain at the default after the page is reopened.
+- This is a replay-tools interface fix only and does not change rendering performance, the NitroClash userscript or either game server.
+
+## Version 1.6.0
+
+- Adds experimental 240 FPS MP4 export using smoothly interpolated replay frames.
+- Shows a clear warning when 240 FPS and **Keep under 20 MB** are selected together because the bitrate limit is likely to reduce image quality.
+- Adds a compact **Match appearance** panel for custom pitch, background/bgtile, ball, blue character and red character images.
+- Saves the latest custom appearance assets in browser storage so they return when the site is reopened.
+- Adds optional blue and red character recolouring using the same grayscale-and-tint approach as the supplied NC Skinner userscript.
+- Keeps all appearance work inside the replay viewer/exporter; it adds no in-game or userscript FPS cost.
+
+## Earlier features
 
 - Clicking a replay event now moves the blue playhead and green clip-end marker together.
 
