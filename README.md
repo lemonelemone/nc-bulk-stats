@@ -1,4 +1,4 @@
-# NitroClash Replay Tools v1.9.0
+# NitroClash Replay Tools v1.9.1
 
 This release keeps NC Bulk Stats and adds a separate **NCR to MP4** section.
 
@@ -45,6 +45,8 @@ Version 1.8.1 clarifies that 1080p and longer clips are most at risk of quality 
 Version 1.8.2 replaces the always-visible Fullscreen buttons with discreet corner icons that appear when the replay or clip preview is hovered. The icons remain keyboard accessible and visible on touchscreen devices. Name distance and size can now be dragged or typed to two decimal places, including precise values such as `1.34×`.
 
 Version 1.9.0 adds four shortcuts shown when the main replay is hovered: jump 5 seconds back, set the clip start at the current position, set the clip end at the current position, and jump 5 seconds forward. Hovering each button explains its action.
+
+Version 1.9.1 moves the four replay shortcuts to the bottom centre and places the main replay and clip-preview fullscreen icons at the bottom-right. Shortcut explanations now open above the buttons.
 
 ## Public-site files
 

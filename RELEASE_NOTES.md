@@ -1,4 +1,11 @@
-# NitroClash Replay Tools v1.9.0
+# NitroClash Replay Tools v1.9.1
+
+- Moves the four replay hover shortcuts from the top to the bottom centre.
+- Moves the main replay and clip-preview fullscreen icons to the bottom-right.
+- Opens shortcut explanations above the buttons so they stay inside the video.
+- This is a CSS-only change with no rendering or gameplay FPS cost.
+
+## Version 1.9.0
 
 - Adds four discreet controls shown when the main replay is hovered.
 - Adds **5 seconds back** and **5 seconds forward** shortcuts.
