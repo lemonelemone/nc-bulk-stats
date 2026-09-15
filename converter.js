@@ -61,6 +61,7 @@ const gameAssetsReady = Promise.all([
 const ui = {
   stats: $("statsSection"), clips: $("clipsSection"), input: $("clipFileInput"),
   dropzone: $("clipDropzone"), stage: $("replayStage"), canvas: $("replayCanvas"), fullscreen: $("replayFullscreen"), play: $("playPause"),
+  hoverControls: $("replayHoverControls"), skipBackFive: $("skipBackFive"), skipForwardFive: $("skipForwardFive"), setClipStartHere: $("setClipStartHere"), setClipEndHere: $("setClipEndHere"),
   playhead: $("playhead"), readout: $("timeReadout"), rangeReadout: $("clipRangeReadout"), startSlider: $("clipStartSlider"),
   endSlider: $("clipEndSlider"), start: $("clipStart"), end: $("clipEnd"),
   camera: $("cameraMode"), resolution: $("resolution"), fps: $("frameRate"),
@@ -120,6 +121,10 @@ ui.dropzone.addEventListener("drop", (event) => {
 
 ui.play.addEventListener("click", () => playing ? stopPlayback() : startPlayback());
 ui.fullscreen.addEventListener("click", toggleReplayFullscreen);
+ui.skipBackFive.addEventListener("click", () => setCurrentTime(currentTime - 5));
+ui.skipForwardFive.addEventListener("click", () => setCurrentTime(currentTime + 5));
+ui.setClipStartHere.addEventListener("click", () => setClipBoundary("start", currentTime));
+ui.setClipEndHere.addEventListener("click", () => setClipBoundary("end", currentTime));
 document.addEventListener("fullscreenchange", () => { syncReplayFullscreen(); syncClipPreviewFullscreen(); });
 ui.preview.addEventListener("click", openClipPreview);
 ui.previewClose.addEventListener("click", closeClipPreview);
@@ -232,6 +237,7 @@ async function loadReplayFile(file) {
     for (const element of [ui.play, ui.fullscreen, ui.preview, ui.start, ui.end, ui.camera, ui.resolution, ui.fps, ui.showScoreboard, ui.showEvents, ui.export, ui.sizeLimit]) {
       element.disabled = false;
     }
+    ui.hoverControls.hidden = false;
     ui.start.value = formatTime(0, true);
     ui.end.value = formatTime(Math.min(duration, 10), true);
     renderEvents();
@@ -241,6 +247,7 @@ async function loadReplayFile(file) {
   } catch (error) {
     console.error(error);
     replay = null;
+    ui.hoverControls.hidden = true;
     setStatus(`Couldn’t read this replay: ${error.message}`);
   }
 }

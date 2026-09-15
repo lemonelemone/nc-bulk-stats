@@ -46,6 +46,13 @@
   .hover-fullscreen { position:absolute; top:10px; right:10px; z-index:3; display:grid; place-items:center; width:40px; height:40px; margin:0; padding:8px; border-color:#52739b; background:rgba(8,17,31,.82); box-shadow:0 2px 12px #0008; opacity:0; transform:scale(.94); pointer-events:none; transition:opacity .15s ease,transform .15s ease; }
   .hover-fullscreen svg { display:block; width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
   .replay-stage:hover > .hover-fullscreen,.clip-preview-stage:hover > .hover-fullscreen,.hover-fullscreen:focus-visible { opacity:1; transform:scale(1); pointer-events:auto; }
+  .replay-hover-controls[hidden] { display:none !important; }
+  .replay-hover-controls { position:absolute; top:10px; left:50%; z-index:3; display:flex; gap:6px; opacity:0; transform:translateX(-50%) translateY(-3px); pointer-events:none; transition:opacity .15s ease,transform .15s ease; }
+  .replay-stage:hover > .replay-hover-controls,.replay-hover-controls:focus-within { opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+  .replay-hover-controls button { position:relative; display:grid; place-items:center; min-width:40px; height:40px; margin:0; padding:5px 9px; border-color:#52739b; background:rgba(8,17,31,.82); box-shadow:0 2px 12px #0008; color:var(--text); font-size:20px; font-weight:700; line-height:1; }
+  .replay-hover-controls button::after { content:attr(data-tip); position:absolute; top:calc(100% + 7px); left:50%; width:max-content; max-width:180px; padding:5px 7px; border:1px solid #3b536f; border-radius:5px; background:rgba(5,12,22,.96); color:var(--text); font-size:11px; font-weight:400; line-height:1.25; opacity:0; transform:translateX(-50%) translateY(-2px); pointer-events:none; transition:opacity .12s ease,transform .12s ease; }
+  .replay-hover-controls button:hover::after,.replay-hover-controls button:focus-visible::after { opacity:1; transform:translateX(-50%) translateY(0); }
+  .clip-edge-symbol { min-width:25px; font-size:17px; letter-spacing:-2px; }
   .replay-stage:fullscreen { width:100vw; height:100vh; border-radius:0; background:#000; }
   .replay-stage:fullscreen #replayCanvas { width:min(100vw,177.778vh); height:min(100vh,56.25vw); border:0; border-radius:0; }
   .replay-stage:fullscreen #replayFullscreen { top:14px; right:14px; }
@@ -114,7 +121,7 @@
   .clip-preview-stage:fullscreen { width:100vw; height:100vh; border-radius:0; background:#000; }
   .clip-preview-stage:fullscreen #clipPreviewCanvas { width:min(100vw,177.778vh); height:min(100vh,56.25vw); }
   .clip-preview-stage:fullscreen .clip-preview-fullscreen-controls { position:absolute; right:16px; bottom:16px; display:flex; align-items:center; gap:10px; padding:8px; border-radius:9px; background:rgba(8,17,31,.82); }
-  @media (hover:none) { .hover-fullscreen { opacity:.78; transform:scale(1); pointer-events:auto; } }
+  @media (hover:none) { .hover-fullscreen { opacity:.78; transform:scale(1); pointer-events:auto; }.replay-hover-controls{opacity:.78;transform:translateX(-50%);pointer-events:auto} }
   .privacy-note { font-size:12px; color:var(--muted); margin:9px 0 0; }
   .event-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
   .event-head h3 { margin:0; font-size:16px; }
@@ -159,6 +166,12 @@
 
       <div id="replayStage" class="replay-stage">
         <canvas id="replayCanvas" width="960" height="540"></canvas>
+        <div id="replayHoverControls" class="replay-hover-controls" aria-label="Replay shortcuts" hidden>
+          <button id="skipBackFive" type="button" data-tip="5 seconds back" aria-label="5 seconds back">&lt;</button>
+          <button id="setClipStartHere" type="button" data-tip="Set start of clip here" aria-label="Set start of clip here"><span class="clip-edge-symbol" aria-hidden="true">[→</span></button>
+          <button id="setClipEndHere" type="button" data-tip="Set end of clip here" aria-label="Set end of clip here"><span class="clip-edge-symbol" aria-hidden="true">→]</span></button>
+          <button id="skipForwardFive" type="button" data-tip="5 seconds forward" aria-label="5 seconds forward">&gt;</button>
+        </div>
         <button id="replayFullscreen" class="hover-fullscreen" type="button" aria-label="Show replay fullscreen" title="Fullscreen" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg></button>
       </div>
       <div class="transport">

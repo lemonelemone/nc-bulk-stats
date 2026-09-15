@@ -1,4 +1,4 @@
-# NitroClash Replay Tools v1.8.2
+# NitroClash Replay Tools v1.9.0
 
 This release keeps NC Bulk Stats and adds a separate **NCR to MP4** section.
 
@@ -43,6 +43,8 @@ Version 1.8.0 adds browser-saved **Name distance** and **Name size** sliders plu
 Version 1.8.1 clarifies that 1080p and longer clips are most at risk of quality loss when 120 or 240 FPS is combined with the 20 MB limit. The clip-preview window now explains that preview playback follows the browser, while the selected resolution and FPS apply only to the downloaded MP4. It also removes the Anol Skinner information/install bar while keeping all presets in the dropdowns.
 
 Version 1.8.2 replaces the always-visible Fullscreen buttons with discreet corner icons that appear when the replay or clip preview is hovered. The icons remain keyboard accessible and visible on touchscreen devices. Name distance and size can now be dragged or typed to two decimal places, including precise values such as `1.34×`.
+
+Version 1.9.0 adds four shortcuts shown when the main replay is hovered: jump 5 seconds back, set the clip start at the current position, set the clip end at the current position, and jump 5 seconds forward. Hovering each button explains its action.
 
 ## Public-site files
 

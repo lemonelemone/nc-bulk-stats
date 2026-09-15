@@ -1,4 +1,12 @@
-# NitroClash Replay Tools v1.8.2
+# NitroClash Replay Tools v1.9.0
+
+- Adds four discreet controls shown when the main replay is hovered.
+- Adds **5 seconds back** and **5 seconds forward** shortcuts.
+- Adds shortcuts that move the first green handle to the current position for clip start and the second green handle for clip end.
+- Shows a short explanation when each shortcut is hovered or keyboard-focused.
+- The controls are click-driven and add no continuous replay-rendering or gameplay FPS work.
+
+## Version 1.8.2
 
 - Replaces the main replay’s always-visible Fullscreen button with a discreet corner icon shown on hover.
 - Places the same hover Fullscreen icon directly over the clip preview.
