@@ -1,4 +1,51 @@
-# NitroClash Replay Tools v1.6.1
+# NitroClash Replay Tools v1.8.2
+
+- Replaces the main replay’s always-visible Fullscreen button with a discreet corner icon shown on hover.
+- Places the same hover Fullscreen icon directly over the clip preview.
+- Keeps both controls keyboard accessible and visible on touchscreens.
+- Makes the Name distance and Name size multipliers directly typeable and increases their precision to 0.01 steps.
+- This is a CSS/interface change with no rendering or gameplay FPS cost.
+
+## Version 1.8.1
+
+- Clarifies that 1080p and longer clips are most at risk of reduced image quality when 120 or 240 FPS is combined with **Keep under 20 MB**.
+- Adds a clear note inside Clip preview explaining that it uses browser playback and the selected resolution/FPS apply only to the downloaded MP4.
+- Removes the Anol Skinner information/install bar while keeping its ready-made assets available through the **Preset…** dropdowns.
+- These are text and layout changes only, with no rendering or gameplay FPS cost.
+
+## Version 1.8.0
+
+- Adds a **Name distance** slider to move player names closer to or farther from their characters.
+- Adds a **Name size** slider to make player names smaller or larger.
+- Adds a **Name colour** picker while keeping the current dark colour as the default.
+- Saves all three settings in the current browser and applies them to the replay, clip preview and exported MP4.
+- The controls reuse the existing name-drawing step and add no new rendering loop or gameplay FPS cost.
+
+## Version 1.7.2
+
+- Keeps the full clip preview and its controls vertically centred and visible on shorter browser windows.
+- Moves the clip preview’s Fullscreen button into the top bar beside Close.
+- Renames **Anol preset…** to the simpler **Preset…** on every appearance dropdown.
+- These are interface-only changes and add no replay-rendering or gameplay FPS cost.
+
+## Version 1.7.1
+
+- Shows a quality warning when **Keep under 20 MB** is combined with either 120 FPS or 240 FPS.
+- Recommends 60 FPS when a clearer image is more important than extra interpolated frames under the same file-size limit.
+- Adds **Don’t show again**, saved in the current browser so the warning stays dismissed after the site is reopened.
+- The warning reacts only to control changes and adds no replay-rendering or gameplay FPS cost.
+
+## Version 1.7.0
+
+- Adds all 35 currently available presets from Anol’s Skinner across pitch, background/bgtile, ball, blue character and red character dropdowns. Selecting one downloads it directly and saves it in the existing browser appearance storage.
+- Adds a direct **Install Anol’s Skinner** link for people who also want the Tampermonkey game-skin tool.
+- Adds a native Fullscreen button over the main replay.
+- Adds **Preview clip**, which opens a large overlay and plays exactly the selected start/end range with the chosen camera, zoom, scoreboard and event settings.
+- Adds Play/Pause, Close and Fullscreen controls to the clip-preview overlay.
+- Renames **120 FPS (smooth)** to **120 FPS**.
+- The new preview and appearance features run only when opened or selected. They add no NitroClash gameplay code, server work, or always-running renderer.
+
+## Version 1.6.1
 
 - Fixes the five individual **Use default** buttons. Pitch, background/bgtile, ball and both character assets now return to the built-in NitroClash asset immediately and remain at the default after the page is reopened.
 - This is a replay-tools interface fix only and does not change rendering performance, the NitroClash userscript or either game server.

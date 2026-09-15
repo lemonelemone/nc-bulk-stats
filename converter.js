@@ -11,8 +11,17 @@ const TWENTY_MB = 20_000_000;
 const APPEARANCE_DB = "nc-replay-tools-appearance";
 const APPEARANCE_STORE = "assets";
 const APPEARANCE_SETTINGS = "nc-replay-tools-appearance-settings";
+const FPS_WARNING_DISMISSED = "nc-replay-tools-hide-fps-quality-warning";
 const SKIN_TYPES = ["pitch", "background", "ball", "blue", "red"];
 const MAX_SKIN_BYTES = 5 * 1024 * 1024;
+const ANOL_SKIN_BASE = "https://raw.githubusercontent.com/anilkaradeniz/tampermonkey-scripts/4a8f7c0383830d944dbb07bd14a88a2b7116d3ac/skins";
+const ANOL_SKINS = {
+  pitch: { folder: "field", names: ["bigstripes", "cartoonish-grass-min", "cartoonish-grass", "checkerboard", "dark-glowy", "dead-grass", "football", "neon", "plain", "premier", "round", "snowy", "stripes", "tennis2", "TT-ameliore", "VVV-dark", "VVV", "xmas"] },
+  background: { folder: "bg", names: ["blue", "dark", "xdark"] },
+  ball: { folder: "ball", names: ["black", "bright-diamond", "classic", "diamond", "gold", "winter"] },
+  blue: { folder: "blue", names: ["bright", "ghost", "liverpool", "pacman"] },
+  red: { folder: "red", names: ["bright", "ghost", "liverpool", "pacman"] }
+};
 const BOOST_POSITIONS = [
   15.696192, 47.998825, 15.696192, 8.251172, 14.100928, 28.125,
   35.927097, 34.41909, 35.927097, 21.83091, 50, 50.166016,
@@ -51,15 +60,21 @@ const gameAssetsReady = Promise.all([
 
 const ui = {
   stats: $("statsSection"), clips: $("clipsSection"), input: $("clipFileInput"),
-  dropzone: $("clipDropzone"), canvas: $("replayCanvas"), play: $("playPause"),
+  dropzone: $("clipDropzone"), stage: $("replayStage"), canvas: $("replayCanvas"), fullscreen: $("replayFullscreen"), play: $("playPause"),
   playhead: $("playhead"), readout: $("timeReadout"), rangeReadout: $("clipRangeReadout"), startSlider: $("clipStartSlider"),
   endSlider: $("clipEndSlider"), start: $("clipStart"), end: $("clipEnd"),
   camera: $("cameraMode"), resolution: $("resolution"), fps: $("frameRate"),
   showScoreboard: $("showScoreboard"), showEvents: $("showEvents"),
   export: $("exportMp4"), sizeLimit: $("sizeLimit"), exportStatus: $("exportStatus"), progress: $("exportProgress"),
   eventList: $("eventList"), eventCount: $("eventCount"), qualityWarning: $("qualityWarning"),
+  qualityWarningText: $("qualityWarningText"), dismissQualityWarning: $("dismissQualityWarning"),
   tintCharacters: $("tintCharacters"), blueColour: $("blueCharacterColour"), redColour: $("redCharacterColour"),
-  resetAppearance: $("resetAppearance")
+  nameDistance: $("nameDistance"), nameDistanceValue: $("nameDistanceValue"), nameSize: $("nameSize"), nameSizeValue: $("nameSizeValue"), nameColour: $("nameColour"),
+  resetAppearance: $("resetAppearance"), preview: $("previewClip"), previewOverlay: $("clipPreviewOverlay"),
+  previewStage: $("clipPreviewStage"), previewCanvas: $("clipPreviewCanvas"), previewClose: $("closeClipPreview"),
+  previewPlay: $("clipPreviewPlay"), previewPlayBelow: $("clipPreviewPlayBelow"),
+  previewTime: $("clipPreviewTime"), previewTimeBelow: $("clipPreviewTimeBelow"),
+  previewFullscreen: $("clipPreviewFullscreen"), previewFullscreenBelow: $("clipPreviewFullscreenBelow")
 };
 
 let replay = null;
@@ -70,6 +85,14 @@ let animationId = 0;
 let exporting = false;
 let followZoom = 1;
 let appearanceSettings = readAppearanceSettings();
+let clipPreviewStart = 0;
+let clipPreviewEnd = 0;
+let clipPreviewTime = 0;
+let clipPreviewPlaying = false;
+let clipPreviewPreviousTime = 0;
+let clipPreviewAnimation = 0;
+let qualityWarningDismissed = false;
+try { qualityWarningDismissed = localStorage.getItem(FPS_WARNING_DISMISSED) === "1"; } catch (_) {}
 
 document.querySelectorAll(".tab").forEach((button) => {
   button.addEventListener("click", () => {
@@ -96,9 +119,26 @@ ui.dropzone.addEventListener("drop", (event) => {
 });
 
 ui.play.addEventListener("click", () => playing ? stopPlayback() : startPlayback());
+ui.fullscreen.addEventListener("click", toggleReplayFullscreen);
+document.addEventListener("fullscreenchange", () => { syncReplayFullscreen(); syncClipPreviewFullscreen(); });
+ui.preview.addEventListener("click", openClipPreview);
+ui.previewClose.addEventListener("click", closeClipPreview);
+ui.previewPlay.addEventListener("click", toggleClipPreviewPlayback);
+ui.previewPlayBelow.addEventListener("click", toggleClipPreviewPlayback);
+ui.previewFullscreen.addEventListener("click", toggleClipPreviewFullscreen);
+ui.previewFullscreenBelow.addEventListener("click", toggleClipPreviewFullscreen);
+ui.previewOverlay.addEventListener("click", (event) => { if (event.target === ui.previewOverlay) closeClipPreview(); });
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !ui.previewOverlay.hidden && !document.fullscreenElement) closeClipPreview();
+});
 ui.playhead.addEventListener("input", () => setCurrentTime(Number(ui.playhead.value)));
 ui.camera.addEventListener("change", drawPreview);
 ui.fps.addEventListener("change", updateQualityWarning);
+ui.dismissQualityWarning.addEventListener("click", () => {
+  qualityWarningDismissed = true;
+  try { localStorage.setItem(FPS_WARNING_DISMISSED, "1"); } catch (_) {}
+  updateQualityWarning();
+});
 ui.showScoreboard.addEventListener("change", drawPreview);
 ui.showEvents.addEventListener("change", drawPreview);
 ui.canvas.addEventListener("wheel", (event) => {
@@ -120,11 +160,23 @@ ui.sizeLimit.addEventListener("click", () => {
 });
 ui.export.addEventListener("click", exportMp4);
 
-document.querySelectorAll("[data-skin]").forEach((input) => input.addEventListener("change", () => importSkin(input.dataset.skin, input.files?.[0])));
+document.querySelectorAll("[data-skin]").forEach((input) => input.addEventListener("change", () => {
+  const preset = document.querySelector(`[data-skin-preset="${input.dataset.skin}"]`);
+  if (preset) preset.value = "";
+  importSkin(input.dataset.skin, input.files?.[0]);
+}));
 document.querySelectorAll("[data-skin-reset]").forEach((button) => button.addEventListener("click", () => resetSkin(button.dataset.skinReset)));
+populateAnolPresets();
+document.querySelectorAll("[data-skin-preset]").forEach((select) => select.addEventListener("change", () => {
+  if (select.value) applyAnolPreset(select.dataset.skinPreset, select.value);
+}));
 ui.tintCharacters.checked = appearanceSettings.tint;
 ui.blueColour.value = appearanceSettings.blue;
 ui.redColour.value = appearanceSettings.red;
+ui.nameDistance.value = String(appearanceSettings.nameDistance);
+ui.nameSize.value = String(appearanceSettings.nameSize);
+ui.nameColour.value = appearanceSettings.nameColour;
+syncNameplateControls();
 syncCharacterColourControls();
 ui.tintCharacters.addEventListener("change", () => {
   appearanceSettings.tint = ui.tintCharacters.checked;
@@ -138,6 +190,23 @@ for (const input of [ui.blueColour, ui.redColour]) input.addEventListener("input
   appearanceSettings.red = ui.redColour.value;
   saveAppearanceSettings();
   rebuildTintedPlayers();
+  drawPreview();
+});
+for (const input of [ui.nameDistance, ui.nameSize]) input.addEventListener("input", () => {
+  appearanceSettings.nameDistance = Number(ui.nameDistance.value);
+  appearanceSettings.nameSize = Number(ui.nameSize.value);
+  syncNameplateControls();
+  saveAppearanceSettings();
+  drawPreview();
+});
+for (const input of [ui.nameDistanceValue, ui.nameSizeValue]) input.addEventListener("input", () => updateNameplateFromTypedValue(input));
+for (const input of [ui.nameDistanceValue, ui.nameSizeValue]) input.addEventListener("change", () => {
+  updateNameplateFromTypedValue(input);
+  syncNameplateControls();
+});
+ui.nameColour.addEventListener("input", () => {
+  appearanceSettings.nameColour = ui.nameColour.value;
+  saveAppearanceSettings();
   drawPreview();
 });
 ui.resetAppearance.addEventListener("click", resetAllAppearance);
@@ -160,7 +229,7 @@ async function loadReplayFile(file) {
     ui.playhead.value = "0";
     ui.startSlider.value = "0";
     ui.endSlider.value = String(Math.min(duration, 10));
-    for (const element of [ui.play, ui.start, ui.end, ui.camera, ui.resolution, ui.fps, ui.showScoreboard, ui.showEvents, ui.export, ui.sizeLimit]) {
+    for (const element of [ui.play, ui.fullscreen, ui.preview, ui.start, ui.end, ui.camera, ui.resolution, ui.fps, ui.showScoreboard, ui.showEvents, ui.export, ui.sizeLimit]) {
       element.disabled = false;
     }
     ui.start.value = formatTime(0, true);
@@ -394,10 +463,10 @@ function drawPlayer(ctx, sx, sy, scale, player, slot, name) {
     ctx.beginPath(); ctx.arc(x, y, size / 2, 0, Math.PI * 2); ctx.fill();
   }
   if (name) {
-    ctx.font = `bold ${Math.max(10, widthScaled(14, ctx.canvas.width))}px Arial`;
+    ctx.font = `bold ${Math.max(10, widthScaled(14, ctx.canvas.width)) * appearanceSettings.nameSize}px Arial`;
     ctx.textAlign = "center";
-    ctx.fillStyle = "rgba(0,0,0,.62)";
-    const labelY = y - size * .72;
+    ctx.fillStyle = colourWithAlpha(appearanceSettings.nameColour, .62);
+    const labelY = y - size * .72 * appearanceSettings.nameDistance;
     ctx.fillText(name.slice(0, 16), x, labelY);
   }
 }
@@ -423,13 +492,16 @@ function drawWholeImage(ctx, image, x, y, size, angle) {
 }
 
 function readAppearanceSettings() {
-  const defaults = { tint: false, blue: "#3b4f8f", red: "#d37647" };
+  const defaults = { tint: false, blue: "#3b4f8f", red: "#d37647", nameDistance: 1, nameSize: 1, nameColour: "#000000" };
   try {
     const saved = JSON.parse(localStorage.getItem(APPEARANCE_SETTINGS) || "null");
     return {
       tint: saved?.tint === true,
       blue: /^#[0-9a-f]{6}$/i.test(saved?.blue || "") ? saved.blue : defaults.blue,
-      red: /^#[0-9a-f]{6}$/i.test(saved?.red || "") ? saved.red : defaults.red
+      red: /^#[0-9a-f]{6}$/i.test(saved?.red || "") ? saved.red : defaults.red,
+      nameDistance: clamp(Number(saved?.nameDistance) || defaults.nameDistance, .5, 2.5),
+      nameSize: clamp(Number(saved?.nameSize) || defaults.nameSize, .5, 2),
+      nameColour: /^#[0-9a-f]{6}$/i.test(saved?.nameColour || "") ? saved.nameColour : defaults.nameColour
     };
   } catch (_) {
     return defaults;
@@ -470,8 +542,39 @@ async function appearanceDbRequest(mode, action) {
 function setSkinState(type, name = "") {
   const state = document.querySelector(`[data-skin-state="${type}"]`);
   if (!state) return;
-  state.textContent = name ? `Custom: ${name}` : "Default";
+  state.textContent = name ? (name.startsWith("Anol: ") ? name : `Custom: ${name}`) : "Default";
   state.title = name || "Default";
+}
+
+function populateAnolPresets() {
+  for (const [type, details] of Object.entries(ANOL_SKINS)) {
+    const select = document.querySelector(`[data-skin-preset="${type}"]`);
+    if (!select) continue;
+    for (const name of details.names) {
+      const option = document.createElement("option");
+      option.value = name;
+      option.textContent = name.replaceAll("-", " ");
+      select.appendChild(option);
+    }
+  }
+}
+
+async function applyAnolPreset(type, name) {
+  const details = ANOL_SKINS[type];
+  if (!details || !details.names.includes(name)) return;
+  setStatus(`Loading Anol’s ${name.replaceAll("-", " ")} preset…`);
+  try {
+    const response = await fetch(`${ANOL_SKIN_BASE}/${details.folder}/${encodeURIComponent(name)}.png`);
+    if (!response.ok) throw new Error(`download returned ${response.status}`);
+    const blob = await response.blob();
+    if (!blob.type.startsWith("image/")) throw new Error("the preset was not an image");
+    await importSkin(type, new File([blob], `Anol: ${name}`, { type: blob.type || "image/png" }));
+  } catch (error) {
+    console.error(error);
+    const select = document.querySelector(`[data-skin-preset="${type}"]`);
+    if (select) select.value = "";
+    setStatus(`Couldn’t load that Anol preset: ${error.message}`);
+  }
 }
 
 async function imageFromBlob(type, blob, name) {
@@ -489,6 +592,11 @@ async function imageFromBlob(type, blob, name) {
   customAssetNames.set(type, name || "saved image");
   gameAssets.custom[type] = image;
   setSkinState(type, customAssetNames.get(type));
+  const preset = document.querySelector(`[data-skin-preset="${type}"]`);
+  if (preset) {
+    const savedPreset = String(name || "").startsWith("Anol: ") ? String(name).slice(6) : "";
+    preset.value = [...preset.options].some((option) => option.value === savedPreset) ? savedPreset : "";
+  }
 }
 
 async function restoreAppearance() {
@@ -530,6 +638,8 @@ async function resetSkin(type) {
   customAssetUrls.delete(type);
   customAssetNames.delete(type);
   delete gameAssets.custom[type];
+  const preset = document.querySelector(`[data-skin-preset="${type}"]`);
+  if (preset) preset.value = "";
   setSkinState(type);
   rebuildTintedPlayers();
   drawPreview();
@@ -541,11 +651,19 @@ async function resetAllAppearance() {
   customAssetUrls.clear();
   customAssetNames.clear();
   gameAssets.custom = {};
-  for (const type of SKIN_TYPES) setSkinState(type);
-  appearanceSettings = { tint: false, blue: "#3b4f8f", red: "#d37647" };
+  for (const type of SKIN_TYPES) {
+    setSkinState(type);
+    const preset = document.querySelector(`[data-skin-preset="${type}"]`);
+    if (preset) preset.value = "";
+  }
+  appearanceSettings = { tint: false, blue: "#3b4f8f", red: "#d37647", nameDistance: 1, nameSize: 1, nameColour: "#000000" };
   ui.tintCharacters.checked = false;
   ui.blueColour.value = appearanceSettings.blue;
   ui.redColour.value = appearanceSettings.red;
+  ui.nameDistance.value = String(appearanceSettings.nameDistance);
+  ui.nameSize.value = String(appearanceSettings.nameSize);
+  ui.nameColour.value = appearanceSettings.nameColour;
+  syncNameplateControls();
   saveAppearanceSettings();
   syncCharacterColourControls();
   rebuildTintedPlayers();
@@ -556,6 +674,32 @@ async function resetAllAppearance() {
 function syncCharacterColourControls() {
   ui.blueColour.disabled = !ui.tintCharacters.checked;
   ui.redColour.disabled = !ui.tintCharacters.checked;
+}
+
+function syncNameplateControls() {
+  ui.nameDistanceValue.value = Number(ui.nameDistance.value).toFixed(2);
+  ui.nameSizeValue.value = Number(ui.nameSize.value).toFixed(2);
+}
+
+function updateNameplateFromTypedValue(input) {
+  const distance = input === ui.nameDistanceValue;
+  const slider = distance ? ui.nameDistance : ui.nameSize;
+  const minimum = distance ? .5 : .5;
+  const maximum = distance ? 2.5 : 2;
+  const value = Number(input.value);
+  if (!Number.isFinite(value) || value < minimum || value > maximum) return;
+  slider.value = String(value);
+  appearanceSettings[distance ? "nameDistance" : "nameSize"] = value;
+  saveAppearanceSettings();
+  drawPreview();
+}
+
+function colourWithAlpha(hex, alpha) {
+  const safe = /^#[0-9a-f]{6}$/i.test(hex || "") ? hex : "#000000";
+  const red = parseInt(safe.slice(1, 3), 16);
+  const green = parseInt(safe.slice(3, 5), 16);
+  const blue = parseInt(safe.slice(5, 7), 16);
+  return `rgba(${red},${green},${blue},${alpha})`;
 }
 
 function rebuildTintedPlayers() {
@@ -715,6 +859,121 @@ function stopPlayback() {
   ui.play.textContent = "▶";
 }
 
+async function toggleReplayFullscreen() {
+  if (!replay) return;
+  try {
+    if (document.fullscreenElement === ui.stage) await document.exitFullscreen();
+    else if (ui.stage.requestFullscreen) await ui.stage.requestFullscreen();
+    else setStatus("Fullscreen is not supported by this browser.");
+  } catch (error) {
+    setStatus(`Couldn’t open fullscreen: ${error.message}`);
+  }
+}
+
+function syncReplayFullscreen() {
+  const active = document.fullscreenElement === ui.stage;
+  ui.fullscreen.setAttribute("aria-label", active ? "Exit replay fullscreen" : "Show replay fullscreen");
+  ui.fullscreen.title = active ? "Exit fullscreen" : "Fullscreen";
+  ui.canvas.width = active ? 1920 : 960;
+  ui.canvas.height = active ? 1080 : 540;
+  drawPreview();
+}
+
+function openClipPreview() {
+  if (!replay || exporting) return;
+  const start = clamp(parseTime(ui.start.value), 0, replay.duration);
+  const end = clamp(parseTime(ui.end.value), 0, replay.duration);
+  if (!(end > start)) return setStatus("Choose a clip end time after its start time.");
+  stopPlayback();
+  cancelAnimationFrame(clipPreviewAnimation);
+  clipPreviewStart = start;
+  clipPreviewEnd = end;
+  clipPreviewTime = start;
+  clipPreviewPlaying = true;
+  clipPreviewPreviousTime = performance.now();
+  ui.previewOverlay.hidden = false;
+  document.body.style.overflow = "hidden";
+  drawClipPreview();
+  syncClipPreviewControls();
+  clipPreviewAnimation = requestAnimationFrame(clipPreviewStep);
+  ui.previewClose.focus();
+}
+
+function closeClipPreview() {
+  if (ui.previewOverlay.hidden) return;
+  clipPreviewPlaying = false;
+  cancelAnimationFrame(clipPreviewAnimation);
+  if (document.fullscreenElement === ui.previewStage) document.exitFullscreen().catch(() => {});
+  ui.previewOverlay.hidden = true;
+  document.body.style.overflow = "";
+  ui.preview.focus();
+}
+
+function toggleClipPreviewPlayback() {
+  if (clipPreviewPlaying) {
+    clipPreviewPlaying = false;
+    cancelAnimationFrame(clipPreviewAnimation);
+  } else {
+    if (clipPreviewTime >= clipPreviewEnd) clipPreviewTime = clipPreviewStart;
+    clipPreviewPlaying = true;
+    clipPreviewPreviousTime = performance.now();
+    clipPreviewAnimation = requestAnimationFrame(clipPreviewStep);
+  }
+  syncClipPreviewControls();
+  drawClipPreview();
+}
+
+function clipPreviewStep(now) {
+  if (!clipPreviewPlaying || ui.previewOverlay.hidden) return;
+  clipPreviewTime = Math.min(clipPreviewEnd, clipPreviewTime + (now - clipPreviewPreviousTime) / 1000);
+  clipPreviewPreviousTime = now;
+  drawClipPreview();
+  if (clipPreviewTime >= clipPreviewEnd) {
+    clipPreviewPlaying = false;
+    syncClipPreviewControls();
+  } else {
+    clipPreviewAnimation = requestAnimationFrame(clipPreviewStep);
+  }
+}
+
+function drawClipPreview() {
+  if (!replay || ui.previewOverlay.hidden) return;
+  renderFrame(ui.previewCanvas, clipPreviewTime, ui.camera.value, ui.showScoreboard.checked, ui.showEvents.checked, followZoom);
+  const elapsed = Math.max(0, clipPreviewTime - clipPreviewStart);
+  const duration = Math.max(0, clipPreviewEnd - clipPreviewStart);
+  const label = `${formatTime(elapsed, true)} / ${formatTime(duration, true)}`;
+  ui.previewTime.textContent = label;
+  ui.previewTimeBelow.textContent = label;
+}
+
+function syncClipPreviewControls() {
+  const label = clipPreviewPlaying ? "Pause" : (clipPreviewTime >= clipPreviewEnd ? "Replay" : "Play");
+  ui.previewPlay.textContent = clipPreviewPlaying ? "❚❚" : "▶";
+  ui.previewPlay.setAttribute("aria-label", `${label} clip preview`);
+  ui.previewPlayBelow.textContent = label;
+}
+
+async function toggleClipPreviewFullscreen() {
+  try {
+    if (document.fullscreenElement === ui.previewStage) await document.exitFullscreen();
+    else if (ui.previewStage.requestFullscreen) await ui.previewStage.requestFullscreen();
+    else setStatus("Fullscreen is not supported by this browser.");
+  } catch (error) {
+    setStatus(`Couldn’t open fullscreen: ${error.message}`);
+  }
+}
+
+function syncClipPreviewFullscreen() {
+  const active = document.fullscreenElement === ui.previewStage;
+  const label = active ? "Exit fullscreen" : "Fullscreen";
+  ui.previewFullscreen.textContent = label;
+  ui.previewFullscreenBelow.setAttribute("aria-label", active ? "Exit clip preview fullscreen" : "Show clip preview fullscreen");
+  ui.previewFullscreenBelow.title = label;
+  ui.previewCanvas.width = active ? 1920 : 960;
+  ui.previewCanvas.height = active ? 1080 : 540;
+  drawClipPreview();
+}
+
 function setCurrentTime(value) {
   if (!replay) return;
   currentTime = clamp(value, 0, replay.duration);
@@ -814,7 +1073,7 @@ async function exportMp4() {
 }
 
 function lockControls(locked) {
-  for (const element of [ui.input, ui.play, ui.playhead, ui.startSlider, ui.endSlider, ui.start, ui.end, ui.camera, ui.resolution, ui.fps, ui.showScoreboard, ui.showEvents, ui.export, ui.sizeLimit]) {
+  for (const element of [ui.input, ui.play, ui.fullscreen, ui.preview, ui.playhead, ui.startSlider, ui.endSlider, ui.start, ui.end, ui.camera, ui.resolution, ui.fps, ui.showScoreboard, ui.showEvents, ui.export, ui.sizeLimit]) {
     element.disabled = locked;
   }
 }
@@ -872,7 +1131,11 @@ async function encodeClip({ start, end, fps, width, height, bitrate, camera, sho
 
 function setStatus(message) { ui.exportStatus.textContent = message; }
 function updateQualityWarning() {
-  const visible = Number(ui.fps.value) === 240 && ui.sizeLimit.getAttribute("aria-pressed") === "true";
+  const fps = Number(ui.fps.value);
+  const visible = !qualityWarningDismissed && fps >= 120 && ui.sizeLimit.getAttribute("aria-pressed") === "true";
+  ui.qualityWarningText.textContent = fps >= 240
+    ? "240 FPS with the 20 MB limit is likely to reduce image quality, especially for 1080p or longer clips. 60 FPS may be preferred for a clearer clip."
+    : "120 FPS with the 20 MB limit may reduce image quality, especially for 1080p or longer clips. 60 FPS may be preferred for a clearer clip.";
   ui.qualityWarning.classList.toggle("visible", visible);
 }
 function updateCameraZoomLabel() {
