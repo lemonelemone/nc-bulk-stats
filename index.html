@@ -547,47 +547,94 @@ function computePoints(events, winningSlots, substitutions) {
 }
 
 function parseReplay(data) {
-  const { nameRecords, events } = scanFooter(data);
-  const { names, substitutions } = resolveNames(nameRecords);
-  const goals = events.filter(e => e.type === "GOAL");
-  const hatTricks = events.filter(e => e.type === "HAT_TRICK");
-  const winningSlots = new Set(events.filter(e => e.type === "WINNING_TEAM_SLOT").map(e => e.slot));
-  const points = computePoints(events, winningSlots, substitutions);
+  if (!window.NcrReplayParser) throw new Error("replay parser is not ready");
+  const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+  const replay = window.NcrReplayParser.parseNcr(buffer, "bulk-stats.ncr");
+  const activeBySlot = new Map();
+  const rowsByName = new Map();
 
-  const allSlots = new Set([
-    ...Object.keys(names).map(Number),
-    ...goals.map(g => g.scorerSlot), ...goals.map(g => g.assistSlot),
-    ...Object.keys(points).map(Number),
-  ]);
+  function cleanName(name, slot) {
+    const cleaned = breakFlagLigatures(String(name || "")).trim();
+    return cleaned || `Unknown player (slot ${slot + 1})`;
+  }
 
-  const stats = {};
-  for (const slot of allSlots) {
-    stats[slot] = {
-      name: names[slot] !== undefined ? names[slot] : "slot" + slot,
-      goals: 0, assists: 0, hatTrick: false,
-      won: winningSlots.has(slot) && !(slot in substitutions),
-    };
+  function ensureRow(slot, suppliedName) {
+    const name = cleanName(suppliedName || activeBySlot.get(slot), slot);
+    if (!rowsByName.has(name)) {
+      rowsByName.set(name, {
+        slot, name, goals: 0, assists: 0, saves: 0, points: 0,
+        hatTrick: false, won: false, mvp: false,
+      });
+    }
+    return rowsByName.get(name);
   }
-  for (const g of goals) {
-    if (!(g.scorerSlot in substitutions) || g.tick <= substitutions[g.scorerSlot]) stats[g.scorerSlot].goals += 1;
-    if (!(g.assistSlot in substitutions) || g.tick <= substitutions[g.assistSlot]) stats[g.assistSlot].assists += 1;
+
+  function rowAt(slot) {
+    return ensureRow(slot, activeBySlot.get(slot));
   }
-  for (const h of hatTricks) {
-    if (stats[h.slot] && (!(h.slot in substitutions) || h.tick <= substitutions[h.slot])) stats[h.slot].hatTrick = true;
+
+  function add(slot, points) {
+    rowAt(slot).points += points;
   }
-  const savesBySlot = {};
-  for (const e of events) {
-    if (e.type === "UNKNOWN_0x02") {
-      if (e.slot in substitutions && e.tick > substitutions[e.slot]) continue;
-      savesBySlot[e.slot] = (savesBySlot[e.slot] || 0) + 1;
+
+  for (const event of replay.events) {
+    if (event.type === 200) {
+      const name = cleanName(event.name, event.slot1);
+      activeBySlot.set(event.slot1, name);
+      ensureRow(event.slot1, name);
+      continue;
+    }
+    if (event.type === 201) {
+      const leavingName = cleanName(event.name || activeBySlot.get(event.slot1), event.slot1);
+      ensureRow(event.slot1, leavingName);
+      if (!activeBySlot.has(event.slot1) || activeBySlot.get(event.slot1) === leavingName) activeBySlot.delete(event.slot1);
+      continue;
+    }
+    if (event.type === 202) {
+      const scorer = rowAt(event.slot1);
+      scorer.goals += 1;
+      scorer.points += POINTS.goal;
+      if (event.slot2 !== 255) {
+        const assister = rowAt(event.slot2);
+        assister.assists += 1;
+        assister.points += POINTS.assist;
+      }
+      continue;
+    }
+    if (event.type === 2) {
+      const saver = rowAt(event.slot1);
+      saver.saves += 1;
+      saver.points += 50;
+    } else if (event.type === 4) {
+      add(event.slot1, POINTS.overtimeGoal);
+    } else if (event.type === 5) {
+      const player = rowAt(event.slot1);
+      player.hatTrick = true;
+      player.points += POINTS.hatTrick;
+    } else if (event.type === 6 || event.type === 7) {
+      add(event.slot1, 30);
+    } else if (event.type === 8) {
+      add(event.slot1, 20);
+    } else if (event.type === 9) {
+      add(event.slot1, 10);
+    } else if (event.type === 10) {
+      const winner = rowAt(event.slot1);
+      winner.won = true;
+      winner.points += POINTS.victory;
     }
   }
-  for (const slot in stats) { stats[slot].saves = savesBySlot[slot] || 0; stats[slot].points = points[slot] || 0; }
-  let maxPoints = 0;
-  for (const slot in stats) maxPoints = Math.max(maxPoints, stats[slot].points);
-  for (const slot in stats) stats[slot].mvp = stats[slot].points === maxPoints && maxPoints > 0;
 
-  return { names, stats };
+  // A zero-point AI that only appeared during an immediate reconnect is not a
+  // participant row. AI fill-ins that actually earned points remain separate.
+  const rows = Array.from(rowsByName.values()).filter((row) =>
+    !row.name.startsWith("[AI]") || row.points > 0 || row.goals > 0 || row.assists > 0 || row.saves > 0
+  );
+  const maxPoints = rows.reduce((max, row) => Math.max(max, row.points), 0);
+  for (const row of rows) row.mvp = maxPoints > 0 && row.points === maxPoints;
+
+  const stats = {};
+  rows.sort((a, b) => a.slot - b.slot || a.name.localeCompare(b.name)).forEach((row, index) => { stats[index] = row; });
+  return { names: Object.fromEntries(rows.map((row) => [row.slot, row.name])), stats };
 }
 
 /* ============================================================
@@ -623,6 +670,12 @@ document.getElementById("copyTable").addEventListener("click", copyTable);
 
 async function handleFiles(fileList) {
   const files = Array.from(fileList).filter(f => f.name.toLowerCase().endsWith(".ncr"));
+  if (!window.NcrReplayParser) {
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error("replay parser did not load")), 10000);
+      window.addEventListener("ncr-replay-parser-ready", () => { clearTimeout(timeout); resolve(); }, { once: true });
+    });
+  }
   for (const file of files) {
     const key = file.name + file.size;
     if (processedFiles.has(key)) continue;
@@ -632,11 +685,14 @@ async function handleFiles(fileList) {
     try {
       const buf = await file.arrayBuffer();
       const result = parseReplay(new Uint8Array(buf));
-      const slots = Object.keys(result.stats).map(Number).sort((a, b) => a - b);
+      const slots = Object.keys(result.stats).map(Number).sort((a, b) => {
+        const left = result.stats[a], right = result.stats[b];
+        return left.slot - right.slot || left.name.localeCompare(right.name);
+      });
       const matchName = file.name.replace(/\.ncr$/i, "");
       for (const slot of slots) {
         const s = result.stats[slot];
-        perMatchRows.push({ match: matchName, slot, name: s.name, goals: s.goals, assists: s.assists, saves: s.saves, points: s.points, won: s.won, mvp: s.mvp });
+        perMatchRows.push({ match: matchName, slot: s.slot, name: s.name, goals: s.goals, assists: s.assists, saves: s.saves, points: s.points, won: s.won, mvp: s.mvp });
       }
       const mvp = slots.map(s => result.stats[s]).find(s => s.mvp);
       line.textContent = "✓ " + file.name + " — " + slots.length + " players, MVP: " + (mvp ? mvp.name : "—");
@@ -674,6 +730,7 @@ function deriveMatchKey(matchName) {
 function aggregateByMatch(rows) {
   const grouped = {};
   for (const r of rows) {
+    if (/^\[AI\]/i.test(r.name.trim())) continue;
     const matchKey = deriveMatchKey(r.match);
     const nameKey = r.name.trim();
     const key = matchKey + "\u0001" + nameKey;

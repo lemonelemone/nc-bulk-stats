@@ -1,4 +1,16 @@
-# NitroClash Replay Tools v1.9.1
+# NitroClash Replay Tools v1.10.0
+
+- Replaces the old Bulk Stats footer scan with the replay viewer's structural NCR parser.
+- Fixes long overtime matches losing every event after a player leaves, reconnects or is replaced by an AI.
+- Keeps goals, assists, saves, overtime bonuses and victory bonuses from the complete replay.
+- Gives different players or AI fill-ins separate statistics when they share a slot.
+- Combines genuine same-name reconnects into the returning player's existing row.
+- Shows point-scoring AI fill-ins while hiding zero-point AI placeholders created during an immediate reconnect.
+- Excludes AI players from the NCSC table and NCSC CSV while retaining them in detailed per-match results.
+- Uses `Unknown player (slot N)` instead of `slot1`/`slot2` if a replay genuinely contains no name.
+- This work runs only when NCR files are selected on the statistics page and has no game or replay-viewer FPS cost.
+
+## Version 1.9.1
 
 - Moves the four replay hover shortcuts from the top to the bottom centre.
 - Moves the main replay and clip-preview fullscreen icons to the bottom-right.

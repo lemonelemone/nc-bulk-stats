@@ -1,4 +1,4 @@
-# NitroClash Replay Tools v1.9.1
+# NitroClash Replay Tools v1.10.0
 
 This release keeps NC Bulk Stats and adds a separate **NCR to MP4** section.
 
@@ -47,6 +47,8 @@ Version 1.8.2 replaces the always-visible Fullscreen buttons with discreet corne
 Version 1.9.0 adds four shortcuts shown when the main replay is hovered: jump 5 seconds back, set the clip start at the current position, set the clip end at the current position, and jump 5 seconds forward. Hovering each button explains its action.
 
 Version 1.9.1 moves the four replay shortcuts to the bottom centre and places the main replay and clip-preview fullscreen icons at the bottom-right. Shortcut explanations now open above the buttons.
+
+Version 1.10.0 replaces Bulk Stats' older footer scanner with the same structural NCR parser used by the replay viewer. Long overtime matches, goals after player changes, assists and victory bonuses are now retained. Different players and AI fill-ins sharing one slot receive separate detailed rows, while a player returning with the same name keeps one combined row. AI rows are excluded from the NCSC table and its CSV. Missing recorded names use a clear `Unknown player (slot N)` label instead of `slot1`, `slot2`, and similar placeholders.
 
 ## Public-site files
 

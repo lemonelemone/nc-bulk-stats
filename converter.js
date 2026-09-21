@@ -284,6 +284,12 @@ function parseNcr(buffer, filename) {
   return parsedReplay;
 }
 
+// Bulk Stats and the clip viewer share this structural NCR parser. Keeping one
+// parser prevents the stats page from losing events after reconnects, player
+// replacements or long overtime matches.
+window.NcrReplayParser = Object.freeze({ parseNcr });
+window.dispatchEvent(new Event("ncr-replay-parser-ready"));
+
 function findGoalCelebrationPauses(parsedReplay) {
   const pauses = [];
   for (const goal of parsedReplay.events.filter((event) => event.type === 202)) {
