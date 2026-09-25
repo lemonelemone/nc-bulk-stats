@@ -1,5 +1,12 @@
 # NitroClash Replay Tools v1.10.0
 
+## NC11 replay viewer page
+
+- Adds **NC11 Replay Viewer** as the third main navigation button.
+- Opens the 11v11 `.nc11replay` viewer on its own page.
+- Adds matching navigation on the viewer page to return to Bulk Stats or NCR to MP4.
+- Keeps replay processing local to the browser.
+
 - Replaces the old Bulk Stats footer scan with the replay viewer's structural NCR parser.
 - Fixes long overtime matches losing every event after a player leaves, reconnects or is replaced by an AI.
 - Keeps goals, assists, saves, overtime bonuses and victory bonuses from the complete replay.

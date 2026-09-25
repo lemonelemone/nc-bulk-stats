@@ -97,6 +97,10 @@ try { qualityWarningDismissed = localStorage.getItem(FPS_WARNING_DISMISSED) === 
 
 document.querySelectorAll(".tab").forEach((button) => {
   button.addEventListener("click", () => {
+    if (button.dataset.tool === "nc11-viewer") {
+      window.location.href = "./nc11-replay-viewer.html";
+      return;
+    }
     document.querySelectorAll(".tab").forEach((item) => item.classList.toggle("active", item === button));
     const showClips = button.dataset.tool === "clips";
     ui.stats.hidden = showClips;
@@ -106,6 +110,8 @@ document.querySelectorAll(".tab").forEach((button) => {
     if (showClips && replay) drawPreview();
   });
 });
+
+if (window.location.hash === "#clips") document.querySelector('[data-tool="clips"]')?.click();
 
 ui.input.addEventListener("change", () => loadReplayFile(ui.input.files[0]));
 ui.dropzone.addEventListener("dragover", (event) => {

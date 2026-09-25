@@ -1,6 +1,8 @@
 # NitroClash Replay Tools v1.10.0
 
-This release keeps NC Bulk Stats and adds a separate **NCR to MP4** section.
+This release includes three tools: **Bulk Stats**, **NCR to MP4**, and a separate **NC11 Replay Viewer** page for `.nc11replay` files.
+
+Use the third navigation button to open the NC11 viewer. It runs locally in the browser and returns to the other tools through the navigation buttons at the top-left.
 
 ## Simple local test
 
